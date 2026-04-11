@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStadium AI | Unified Ecosystem</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div id="app">
+        <!-- Desktop Sidebar -->
+        <aside>
+            <div class="brand">
+                <i data-lucide="stadium"></i>
+                <span>SmartStadium</span>
+            </div>
+            <nav class="menu-list">
+                <li class="menu-item active" data-tab="map"><i data-lucide="map"></i> Map</li>
+                <li class="menu-item" data-tab="assistant"><i data-lucide="bot"></i> AI Assistant</li>
+                <li class="menu-item" data-tab="stalls"><i data-lucide="utensils"></i> Food Stalls</li>
+                <li class="menu-item" data-tab="staff"><i data-lucide="shield"></i> Staff Hub <span class="staff-badge">Internal</span></li>
+            </nav>
+            <div class="menu-footer">
+                <button class="btn" id="theme-toggle" style="width:100%; display:flex; gap:8px; align-items:center;">
+                    <i data-lucide="moon"></i> Toggle Dark Mode
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <header>
+                <div id="view-title" style="font-weight: 700; font-size: 1.1rem;">Live Venue Overview</div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <select id="stadium-select" style="padding: 0.4rem; border-radius: 0.5rem; border: 1px solid var(--border); font-size: 0.85rem; background: var(--bg-secondary); color: var(--text-primary);">
+                        <option value="ahmedabad">Narendra Modi (Ahmedabad)</option>
+                        <option value="mumbai">Wankhede (Mumbai)</option>
+                    </select>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);" class="desktop-only">
+                        GPS Sync: <span id="gps-status" style="color: #22c55e;">● Active</span>
+                    </div>
+                </div>
+            </header>
+
+            <section id="content-map" class="tab-content" style="flex:1; display:flex; flex-direction:column;">
+                <div id="map-box"></div>
+                <div class="floating-overlay">
+                    <div class="glass-card">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700;">AI Insight</div>
+                        <p id="live-insight" style="font-size: 0.9rem; font-weight: 600;">Analyzing stadium movement...</p>
+                        <hr style="margin: 8px 0; border: 0; border-top: 1px solid var(--border);">
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary" id="sim-location" style="font-size: 0.7rem; padding: 4px 8px;">Simulate Me</button>
+                            <button class="btn" id="find-washroom" style="font-size: 0.7rem; padding: 4px 8px; border: 1px solid var(--border);">Find Washroom</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="content-assistant" class="tab-content" style="display:none;">
+                <div class="assistant-view">
+                    <div class="chat-box" id="chat-container">
+                        <div style="flex:1; padding:1.5rem; overflow-y:auto;" id="chat-messages">
+                            <div style="background:var(--bg-tertiary); padding:1rem; border-radius:1rem; border-bottom-left-radius:0; max-width:80%; margin-bottom:1rem;">
+                                👋 Hello! I'm your SmartStadium AI assistant. How can I help you today?
+                            </div>
+                        </div>
+                        <form id="chat-form" style="padding:1rem; border-top:1px solid var(--border); display:flex; gap:0.5rem;">
+                            <input type="text" id="chat-input" placeholder="Ask about gates, food, or safety..." style="flex:1; padding:0.75rem 1.25rem; border-radius:1.5rem; border:1px solid var(--border); outline:none;">
+                            <button type="submit" class="btn btn-primary" style="padding:0; width:44px; height:44px; border-radius:50%;">
+                                <i data-lucide="send" style="width:18px;"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="content-stalls" class="tab-content" style="display:none;">
+                <div class="stalls-grid" id="stall-container">
+                    <!-- Stalls injected here -->
+                </div>
+            </section>
+
+            <section id="content-staff" class="tab-content" style="display:none; padding:2rem;">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div class="glass-card">
+                        <h3 style="margin-bottom:1.5rem;"><i data-lucide="settings"></i> Control Panel</h3>
+                        <div id="staff-controls">
+                            <!-- Controls injected here -->
+                        </div>
+                        <hr style="margin:1.5rem 0; border:0; border-top:1px solid var(--border);">
+                        <button class="btn btn-primary" id="trigger-evac" style="background:#ef4444; width:100%;">
+                            BROADCAST EMERGENCY EVACUATION
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Mobile Bottom Nav -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-tab="map"><i data-lucide="map"></i></div>
+            <div class="nav-item" data-tab="assistant"><i data-lucide="bot"></i></div>
+            <div class="nav-item" data-tab="stalls"><i data-lucide="list"></i></div>
+            <div class="nav-item" data-tab="staff"><i data-lucide="shield"></i></div>
+        </nav>
+
+        <!-- SOS Trigger -->
+        <button class="sos-trigger" id="sos-btn">SOS</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data/config.js?v=1.1"></script>
+    <script src="simulator.js?v=1.1"></script>
+    <script src="components/maps.js?v=1.1"></script>
+    <script src="components/chatbot.js?v=1.1"></script>
+    <script src="app.js?v=1.1"></script>
+</body>
+</html>

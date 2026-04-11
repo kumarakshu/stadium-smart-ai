@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStadium AI | Control Command</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { padding-bottom: 0; }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 900px) {
+            .admin-grid { grid-template-columns: 1fr; }
+        }
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+        }
+        input[type="range"] {
+            width: 100px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+        .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <i data-lucide="shield-check"></i>
+            Command Center
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+            Live Status: <span style="color: #22c55e;">● Connected</span>
+        </div>
+    </header>
+
+    <main style="max-width: 1200px;">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Attendees</div>
+                <div class="stat-val">42,501</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. Wait Time</div>
+                <div class="stat-val" id="stat-wait">8m</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Alerts</div>
+                <div class="stat-val" id="stat-alerts" style="color: var(--low);">0</div>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Left Column: Map & Monitoring -->
+            <div class="column">
+                <div class="card">
+                    <h2 class="card-title"><i data-lucide="layout"></i> Stadium Overview (Digital Twin)</h2>
+                    <div class="map-container" id="admin-map-box" style="height: 400px;">
+                        <!-- SVG injected via JS -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title"><i data-lucide="alert-circle"></i> Incident Log</h2>
+                    <div id="log-list" style="font-size: 0.85rem;">
+                        <div style="color: var(--text-secondary); font-style: italic;">No active incidents.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Controls -->
+            <div class="column">
+                <div class="card">
+                    <h2 class="card-title"><i data-lucide="sliders"></i> Crowd Management</h2>
+                    <div id="zone-controls">
+                        <!-- Sliders move here -->
+                    </div>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--sos);">
+                    <h2 class="card-title"><i data-lucide="megaphone"></i> Emergency Broadcast</h2>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <button class="btn btn-primary" style="background: var(--sos); width: 100%;" id="br-evac">
+                            Broadcast Evacuation
+                        </button>
+                        <button class="btn" style="border: 1px solid var(--border); width: 100%;" id="br-clear">
+                            Clear All Alerts
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
