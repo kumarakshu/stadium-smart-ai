@@ -2,10 +2,11 @@
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SmartStadium AI | Unified Ecosystem</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.9">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -14,7 +15,7 @@
         <!-- Desktop Sidebar -->
         <aside>
             <div class="brand">
-                <i data-lucide="stadium"></i>
+                <i data-lucide="building-2"></i>
                 <span>SmartStadium</span>
             </div>
             <nav class="menu-list">
@@ -23,100 +24,108 @@
                 <li class="menu-item" data-tab="stalls"><i data-lucide="utensils"></i> Food Stalls</li>
                 <li class="menu-item" data-tab="staff"><i data-lucide="shield"></i> Staff Hub <span class="staff-badge">Internal</span></li>
             </nav>
-            <div class="menu-footer">
-                <button class="btn" id="theme-toggle" style="width:100%; display:flex; gap:8px; align-items:center;">
-                    <i data-lucide="moon"></i> Toggle Dark Mode
-                </button>
-            </div>
+            <!-- Sidebar Footer Removed (Button moved to header) -->
         </aside>
 
-        <!-- Main Content -->
+        <!-- Main Content Area -->
         <main>
             <header>
-                <div id="view-title" style="font-weight: 700; font-size: 1.1rem;">Live Venue Overview</div>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <select id="stadium-select" style="padding: 0.4rem; border-radius: 0.5rem; border: 1px solid var(--border); font-size: 0.85rem; background: var(--bg-secondary); color: var(--text-primary);">
+                <div id="view-title">Live Venue Overview</div>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                    <select id="stadium-select" aria-label="Select Stadium Venue">
                         <option value="ahmedabad">Narendra Modi (Ahmedabad)</option>
                         <option value="mumbai">Wankhede (Mumbai)</option>
                     </select>
-                    <div style="font-size: 0.8rem; color: var(--text-secondary);" class="desktop-only">
-                        GPS Sync: <span id="gps-status" style="color: #22c55e;">● Active</span>
-                    </div>
+                    <div id="gps-status-container" style="font-size: 0.8rem; color: var(--text-2); display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="gps-label">GPS Sync:</span> <span class="indicator" style="color: #22c55e;">● Active</span>
+                </div>
+                    <button class="btn" id="theme-toggle" aria-label="Toggle Dark/Light Mode" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:0; border: 1px solid var(--border); background: var(--bg-secondary);">
+                        <i data-lucide="moon" id="theme-icon" style="width: 16px; height: 16px;"></i>
+                    </button>
                 </div>
             </header>
 
-            <section id="content-map" class="tab-content" style="flex:1; display:flex; flex-direction:column;">
-                <div id="map-box"></div>
+            <!-- 1. Map View Content -->
+            <section id="content-map" class="tab-content" style="flex: 1; position: relative; display: flex;">
                 <div class="floating-overlay">
-                    <div class="glass-card">
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700;">AI Insight</div>
-                        <p id="live-insight" style="font-size: 0.9rem; font-weight: 600;">Analyzing stadium movement...</p>
-                        <hr style="margin: 8px 0; border: 0; border-top: 1px solid var(--border);">
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-primary" id="sim-location" style="font-size: 0.7rem; padding: 4px 8px;">Simulate Me</button>
-                            <button class="btn" id="find-washroom" style="font-size: 0.7rem; padding: 4px 8px; border: 1px solid var(--border);">Find Washroom</button>
+                    <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Smart Suggestion</p>
+                            <div id="live-insight" style="font-size: 0.85rem; font-weight: 600;">Analyzing stadium crowd patterns...</div>
                         </div>
+                        <button class="btn btn-primary" id="sim-location" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Simulate Me</button>
                     </div>
                 </div>
+                <div id="map-box"></div>
             </section>
 
-            <section id="content-assistant" class="tab-content" style="display:none;">
-                <div class="assistant-view">
-                    <div class="chat-box" id="chat-container">
-                        <div style="flex:1; padding:1.5rem; overflow-y:auto;" id="chat-messages">
-                            <div style="background:var(--bg-tertiary); padding:1rem; border-radius:1rem; border-bottom-left-radius:0; max-width:80%; margin-bottom:1rem;">
-                                👋 Hello! I'm your SmartStadium AI assistant. How can I help you today?
-                            </div>
+            <!-- 2. AI Assistant Content -->
+            <section id="content-assistant" class="tab-content assistant-view" style="display: none;">
+                <div class="chat-box">
+                    <div id="chat-messages" class="chat-messages">
+                        <div class="msg msg-bot">
+                            👋 Hello! I'm your SmartStadium AI assistant. How can I help you navigate the venue today?
                         </div>
-                        <form id="chat-form" style="padding:1rem; border-top:1px solid var(--border); display:flex; gap:0.5rem;">
-                            <input type="text" id="chat-input" placeholder="Ask about gates, food, or safety..." style="flex:1; padding:0.75rem 1.25rem; border-radius:1.5rem; border:1px solid var(--border); outline:none;">
-                            <button type="submit" class="btn btn-primary" style="padding:0; width:44px; height:44px; border-radius:50%;">
-                                <i data-lucide="send" style="width:18px;"></i>
-                            </button>
-                        </form>
                     </div>
-                </div>
-            </section>
-
-            <section id="content-stalls" class="tab-content" style="display:none;">
-                <div class="stalls-grid" id="stall-container">
-                    <!-- Stalls injected here -->
-                </div>
-            </section>
-
-            <section id="content-staff" class="tab-content" style="display:none; padding:2rem;">
-                <div style="max-width: 600px; margin: 0 auto;">
-                    <div class="glass-card">
-                        <h3 style="margin-bottom:1.5rem;"><i data-lucide="settings"></i> Control Panel</h3>
-                        <div id="staff-controls">
-                            <!-- Controls injected here -->
-                        </div>
-                        <hr style="margin:1.5rem 0; border:0; border-top:1px solid var(--border);">
-                        <button class="btn btn-primary" id="trigger-evac" style="background:#ef4444; width:100%;">
-                            BROADCAST EMERGENCY EVACUATION
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Ask about gates, food, or safety...">
+                        <button class="btn btn-primary" id="send-btn" aria-label="Send Message" style="border-radius: 50%; width: 44px; height: 44px; padding: 0;">
+                            <i data-lucide="send"></i>
                         </button>
                     </div>
                 </div>
             </section>
+
+            <!-- 3. Food Stalls Content -->
+            <section id="content-stalls" class="tab-content" style="display: none;">
+                <div class="stalls-grid" id="stall-container">
+                    <!-- Cards injected by JS -->
+                </div>
+            </section>
+
+            <!-- 4. Staff Hub Content -->
+            <section id="content-staff" class="tab-content assistant-view" style="display: none;">
+                <div class="chat-box" style="padding: 2rem;">
+                    <div class="staff-header" style="margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 0.5rem;"><i data-lucide="settings"></i> Control Panel</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Manage crowd density and emergency overrides.</p>
+                    </div>
+                    
+                    <div id="staff-controls" style="margin-bottom: 2rem;">
+                        <!-- Controls injected here -->
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border); padding-top: 2rem;">
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <button class="btn btn-primary" id="trigger-evac" style="background:#ef4444; width:100%;">
+                                <i data-lucide="alert-triangle"></i> BROADCAST EMERGENCY EVACUATION
+                            </button>
+                            <button class="btn" id="clear-evac" style="width:100%; border:1px solid var(--border); background:var(--bg-3); font-size: 0.8rem;">
+                                END EMERGENCY & RETURN TO NORMAL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <button class="sos-trigger" id="sos-btn" aria-label="Emergency SOS Button">SOS</button>
         </main>
 
-        <!-- Mobile Bottom Nav -->
-        <nav class="bottom-nav">
-            <div class="nav-item active" data-tab="map"><i data-lucide="map"></i></div>
-            <div class="nav-item" data-tab="assistant"><i data-lucide="bot"></i></div>
-            <div class="nav-item" data-tab="stalls"><i data-lucide="list"></i></div>
-            <div class="nav-item" data-tab="staff"><i data-lucide="shield"></i></div>
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav">
+            <div class="nav-item active" data-tab="map" aria-label="Map View"><i data-lucide="map"></i><span>Map</span></div>
+            <div class="nav-item" data-tab="assistant" aria-label="AI Assistant"><i data-lucide="bot"></i><span>AI</span></div>
+            <div class="nav-item" data-tab="stalls" aria-label="Food Stalls"><i data-lucide="utensils"></i><span>Food</span></div>
+            <div class="nav-item" data-tab="staff" aria-label="Staff Hub"><i data-lucide="shield"></i><span>Staff</span></div>
         </nav>
-
-        <!-- SOS Trigger -->
-        <button class="sos-trigger" id="sos-btn">SOS</button>
     </div>
 
-    <!-- Scripts -->
-    <script src="data/config.js?v=1.1"></script>
-    <script src="simulator.js?v=1.1"></script>
-    <script src="components/maps.js?v=1.1"></script>
-    <script src="components/chatbot.js?v=1.1"></script>
-    <script src="app.js?v=1.1"></script>
+    <!-- Modular Scripts (Top 50 Architecture) -->
+    <script src="src/data/config.js?v=2.0"></script>
+    <script src="src/engine/state.js?v=2.0"></script>
+    <script src="src/engine/simulator.js?v=2.0"></script>
+    <script src="src/components/MapController.js?v=2.0"></script>
+    <script src="src/components/AssistantController.js?v=2.0"></script>
+    <script src="src/main.js?v=2.0"></script>
 </body>
 </html>
