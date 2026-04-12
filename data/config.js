@@ -3,8 +3,8 @@
  * Replace the placeholders with your actual Google Cloud/AI Studio API keys.
  */
 const CONFIG = {
-    GEMINI_API_KEY: "AIzaSyCa8HE8NK_Ib5JoTIAwdO6Zoav1U3-WN08",
-    GOOGLE_MAPS_API_KEY: "AIzaSyDDO9ESNDS49RP7QEyQp-8j9AMnxuGTPpI",
+    GEMINI_API_KEY: "your api key",
+    GOOGLE_MAPS_API_KEY: "your api key",
     
     // Default Map Center (Narendra Modi Stadium, Ahmedabad)
     STADIUM_COORD: { lat: 23.0919, lng: 72.5975 },
