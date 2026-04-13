@@ -16,6 +16,8 @@ async function initApp() {
     setupTheme();
     setupSOS();
     setupStaffControls();
+    setupChatbot();
+    setupVoiceAssistant();
     
     // Restore Session
     activeTab = localStorage.getItem('smartstadium_active_tab') || 'map';
@@ -46,7 +48,7 @@ async function initApp() {
 function updateDynamicUI() {
     if (!window.state || !window.state.stadiums) return;
 
-    // Smart Insight Banner
+    // Smart Insight Banner & Predictive Analytics
     const insightEl = document.getElementById('live-insight');
     if (insightEl) {
         const id = document.getElementById('stadium-select')?.value;
@@ -57,6 +59,20 @@ function updateDynamicUI() {
                 insightEl.innerHTML = `<span style="color:#ef4444; font-weight:800;">🚨 SYSTEM ALERT: Evacuate via ${gates[0].name}</span>`;
             } else if (gates.length > 0) {
                 insightEl.innerText = `💡 Proactive Tip: Use ${gates[0].name} for faster entry (${gates[0].crowd}% crowd).`;
+                
+                // Advanced: Geo-fenced Push Notification Simulation
+                const crowdedGates = stadium.zones.filter(z => z.type === 'entry' && z.crowd > 85);
+                if (crowdedGates.length > 0 && !window.state.alertSent) {
+                    window.state.alertSent = true;
+                    if (Notification.permission === "granted") {
+                        new Notification("SmartStadium AI Alert", {
+                            body: `Predictive Alert: ${crowdedGates[0].name} is reaching maximum capacity. Expect delays.`,
+                            icon: 'favicon.png'
+                        });
+                    } else if (Notification.permission !== "denied") {
+                        Notification.requestPermission();
+                    }
+                }
             }
         }
     }
@@ -156,6 +172,32 @@ function syncTabUI() {
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
+/** 
+ * Elite Voice Assistant Setup 
+ */
+function setupVoiceAssistant() {
+    const toggle = document.getElementById('voice-toggle');
+    const status = document.getElementById('voice-status');
+    const icon = document.getElementById('voice-icon');
+    
+    // Restore
+    const isEnabled = localStorage.getItem('smartstadium_voice') === 'true';
+    if (window.AssistantController) window.AssistantController.voiceEnabled = isEnabled;
+    if (isEnabled && status) status.style.display = 'block';
+
+    toggle.onclick = () => {
+        const next = !window.AssistantController.voiceEnabled;
+        window.AssistantController.voiceEnabled = next;
+        localStorage.setItem('smartstadium_voice', next);
+        
+        if (status) status.style.display = next ? 'block' : 'none';
+        
+        // Haptic feedback simulation (Visual)
+        toggle.style.transform = 'scale(0.9)';
+        setTimeout(() => toggle.style.transform = 'scale(1)', 100);
+    };
+}
+
 function setupTheme() {
     const toggle = document.getElementById('theme-toggle');
     toggle.onclick = () => {
@@ -188,6 +230,83 @@ function setupStaffControls() {
     document.getElementById('clear-evac').onclick = () => {
         if (confirm("Clear Emergency?")) window.StateManager.setEmergency(false, "");
     };
+}
+
+function setupChatbot() {
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const micBtn = document.getElementById('mic-btn');
+    const messages = document.getElementById('chat-messages');
+
+    if (!input || !sendBtn || !messages) return;
+
+    const handleSend = async (overrideQuery = null) => {
+        const query = overrideQuery || input.value.trim();
+        if (!query) return;
+
+        // Add user message
+        appendMessage('user', query);
+        input.value = '';
+
+        // Add thinking indicator with Shimmer Effect
+        const thinkingEl = appendMessage('bot', '');
+        thinkingEl.classList.add('thinking');
+
+        // Get AI response
+        const response = await window.AssistantController.getResponse(query);
+        
+        // Update thinking indicator with actual response
+        if (thinkingEl) {
+            thinkingEl.classList.remove('thinking');
+            thinkingEl.innerText = response;
+        }
+        
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    const appendMessage = (type, text) => {
+        // Enterprise Quality: Basic XSS Sanitization Strategy
+        const sanitizeHTML = (str) => {
+            const temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
+        };
+        
+        const div = document.createElement('div');
+        div.className = `msg msg-${type}`;
+        div.innerHTML = sanitizeHTML(text); // Secure injection
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+        return div;
+    };
+
+    sendBtn.onclick = () => handleSend();
+    input.onkeypress = (e) => {
+        if (e.key === 'Enter') handleSend();
+    };
+
+    if (micBtn && window.AssistantController) {
+        micBtn.onclick = () => {
+            micBtn.style.color = '#ef4444'; // Red to indicate listening
+            micBtn.style.borderColor = '#ef4444';
+            
+            window.AssistantController.listen(
+                (transcript) => {
+                    input.value = transcript;
+                    handleSend(transcript);
+                },
+                (err) => {
+                    console.error("Speech Error:", err);
+                    alert("Voice recognition error: " + err);
+                },
+                () => {
+                    // Reset UI
+                    micBtn.style.color = 'inherit';
+                    micBtn.style.borderColor = 'var(--border)';
+                }
+            );
+        };
+    }
 }
 
 // Global scope joinStall

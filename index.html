@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:;">
     <title>SmartStadium AI | Unified Ecosystem</title>
     <link rel="stylesheet" href="style.css?v=1.9">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -42,6 +43,13 @@
                     <button class="btn" id="theme-toggle" aria-label="Toggle Dark/Light Mode" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:0; border: 1px solid var(--border); background: var(--bg-secondary);">
                         <i data-lucide="moon" id="theme-icon" style="width: 16px; height: 16px;"></i>
                     </button>
+                    <button class="btn" id="voice-toggle" aria-label="Toggle Voice Assistant" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:0; border: 1px solid var(--border); background: var(--bg-secondary); position: relative;">
+                        <i data-lucide="volume-2" id="voice-icon" style="width: 16px; height: 16px;"></i>
+                        <span id="voice-status" style="position:absolute; top:-2px; right:-2px; width:10px; height:10px; background:#ef4444; border-radius:50%; border:2px solid white; display:none;"></span>
+                    </button>
+                    <button class="btn btn-primary" id="sos-btn" aria-label="Emergency SOS Button" style="background:#ef4444; padding: 0.4rem 0.8rem; font-size: 0.75rem; min-width: 50px;">
+                        SOS
+                    </button>
                 </div>
             </header>
 
@@ -60,15 +68,18 @@
             </section>
 
             <!-- 2. AI Assistant Content -->
-            <section id="content-assistant" class="tab-content assistant-view" style="display: none;">
+            <section id="content-assistant" class="tab-content assistant-view" style="display: none;" role="region" aria-label="AI Assistant Chat">
                 <div class="chat-box">
-                    <div id="chat-messages" class="chat-messages">
+                    <div id="chat-messages" class="chat-messages" aria-live="polite">
                         <div class="msg msg-bot">
                             👋 Hello! I'm your SmartStadium AI assistant. How can I help you navigate the venue today?
                         </div>
                     </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chat-input" placeholder="Ask about gates, food, or safety...">
+                    <div class="chat-input-area" style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="text" id="chat-input" placeholder="Ask about gates, food, or safety..." style="flex: 1;">
+                        <button class="btn" id="mic-btn" aria-label="Voice Input" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; background: var(--bg-3); border: 1px solid var(--border);">
+                            <i data-lucide="mic"></i>
+                        </button>
                         <button class="btn btn-primary" id="send-btn" aria-label="Send Message" style="border-radius: 50%; width: 44px; height: 44px; padding: 0;">
                             <i data-lucide="send"></i>
                         </button>
@@ -77,7 +88,7 @@
             </section>
 
             <!-- 3. Food Stalls Content -->
-            <section id="content-stalls" class="tab-content" style="display: none;">
+            <section id="content-stalls" class="tab-content" style="display: none;" role="region" aria-label="Food Stalls List">
                 <div class="stalls-grid" id="stall-container">
                     <!-- Cards injected by JS -->
                 </div>
@@ -108,24 +119,23 @@
                 </div>
             </section>
 
-            <button class="sos-trigger" id="sos-btn" aria-label="Emergency SOS Button">SOS</button>
+
         </main>
 
-        <!-- Mobile Navigation -->
-        <nav class="mobile-nav">
-            <div class="nav-item active" data-tab="map" aria-label="Map View"><i data-lucide="map"></i><span>Map</span></div>
-            <div class="nav-item" data-tab="assistant" aria-label="AI Assistant"><i data-lucide="bot"></i><span>AI</span></div>
-            <div class="nav-item" data-tab="stalls" aria-label="Food Stalls"><i data-lucide="utensils"></i><span>Food</span></div>
-            <div class="nav-item" data-tab="staff" aria-label="Staff Hub"><i data-lucide="shield"></i><span>Staff</span></div>
+        <nav class="mobile-nav" role="navigation" aria-label="Main Navigation">
+            <div class="nav-item active" data-tab="map" aria-label="Map View" role="button"><i data-lucide="map"></i><span>Map</span></div>
+            <div class="nav-item" data-tab="assistant" aria-label="AI Assistant" role="button"><i data-lucide="bot"></i><span>AI</span></div>
+            <div class="nav-item" data-tab="stalls" aria-label="Food Stalls" role="button"><i data-lucide="utensils"></i><span>Food</span></div>
+            <div class="nav-item" data-tab="staff" aria-label="Staff Hub" role="button"><i data-lucide="shield"></i><span>Staff</span></div>
         </nav>
     </div>
 
     <!-- Modular Scripts (Top 50 Architecture) -->
-    <script src="src/data/config.js?v=2.0"></script>
-    <script src="src/engine/state.js?v=2.0"></script>
-    <script src="src/engine/simulator.js?v=2.0"></script>
-    <script src="src/components/MapController.js?v=2.0"></script>
-    <script src="src/components/AssistantController.js?v=2.0"></script>
-    <script src="src/main.js?v=2.0"></script>
+    <script defer src="src/data/config.js?v=2.0"></script>
+    <script defer src="src/engine/state.js?v=2.0"></script>
+    <script defer src="src/engine/simulator.js?v=2.0"></script>
+    <script defer src="src/components/MapController.js?v=2.0"></script>
+    <script defer src="src/components/AssistantController.js?v=2.0"></script>
+    <script defer src="src/main.js?v=2.0"></script>
 </body>
 </html>

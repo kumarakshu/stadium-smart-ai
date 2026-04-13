@@ -22,7 +22,7 @@ const MapController = {
         // Initialize Google Maps with Advanced Markers library
         if (!window.google) {
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.GOOGLE_MAPS_API_KEY}&callback=initMapController&libraries=marker,geometry`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.GOOGLE_MAPS_API_KEY}&callback=initMapController&libraries=marker,geometry&loading=async`;
             script.async = true;
             document.head.appendChild(script);
         } else {

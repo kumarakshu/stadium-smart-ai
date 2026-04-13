@@ -54,13 +54,20 @@ body {
   background-color: var(--bg-1);
   color: var(--text-1);
   transition: background var(--transition), color var(--transition);
-  height: 100vh;
+  height: 100dvh; /* Using DVH for modern mobile browser support */
   width: 100vw;
   overflow: hidden;
   line-height: 1.5;
+  display: flex;
+  flex-direction: column;
 }
 
-#app { display: flex; height: 100%; width: 100%; }
+#app { 
+  display: flex; 
+  height: 100%; 
+  width: 100%; 
+  overflow: hidden;
+}
 
 /* --- Sidebar (Premium Desktop) --- */
 aside {
@@ -126,7 +133,8 @@ main {
   display: flex;
   flex-direction: column;
   background: var(--bg-1);
-  overflow-y: auto;
+  overflow: hidden; /* Each tab will handle its own scroll */
+  position: relative;
 }
 
 header {
@@ -194,6 +202,7 @@ header {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0; /* Important for flex child scrolling */
 }
 
 .chat-box {
@@ -204,7 +213,8 @@ header {
   flex-direction: column;
   box-shadow: var(--shadow-p);
   border: 1px solid var(--border);
-  overflow: hidden;
+  overflow-y: auto; /* Changed from hidden to auto for general scrolling */
+  min-height: 0;
 }
 
 .chat-messages {
@@ -229,6 +239,19 @@ header {
   background: var(--bg-3);
   color: var(--text-1);
   border-bottom-left-radius: 4px;
+}
+
+.msg-bot.thinking {
+    background: linear-gradient(90deg, var(--bg-3) 25%, var(--bg-primary) 50%, var(--bg-3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    width: 120px;
+    height: 40px;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 .msg-user {
@@ -262,6 +285,9 @@ header {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
   padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
 }
 
 .stall-card {
@@ -289,18 +315,21 @@ header {
 
 /* --- Mobile Navigation --- */
 .mobile-nav {
-  position: fixed;
+  position: fixed; /* Keep fixed for overlay style */
   bottom: 0;
   left: 0;
   width: 100%;
+  height: 72px;
   background: var(--glass);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--glass-border);
   display: none;
   justify-content: space-around;
-  padding: 0.75rem 0.5rem;
-  z-index: 200;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+  align-items: center;
+  padding: 0 0.5rem;
+  z-index: 1000;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
 }
 
 .nav-item {
@@ -353,6 +382,12 @@ select:focus {
   box-shadow: 0 0 0 4px var(--accent-glow);
 }
 
+/* Accessibility: Universal Focus Ring */
+:focus-visible {
+    outline: 2px solid var(--accent) !important;
+    outline-offset: 3px !important;
+}
+
 /* --- UI Controls --- */
 .btn {
   padding: 0.75rem 1.5rem;
@@ -392,31 +427,7 @@ select:focus {
     border-color: var(--accent) !important;
 }
 
-/* SOS Trigger Overlay */
-.sos-trigger {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 64px;
-  height: 64px;
-  background: #ef4444;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 4px solid white;
-  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4);
-  cursor: pointer;
-  z-index: 200;
-  transition: 0.3s;
-  font-weight: 800;
-  font-size: 0.9rem;
-}
-
-.sos-trigger:hover { transform: scale(1.1); }
-
-/* --- Animations --- */
+/* Animations */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -426,10 +437,10 @@ select:focus {
 @media (max-width: 850px) {
   aside { display: none; }
   .mobile-nav { display: flex; }
-  main { padding-bottom: 70px; }
+  /* Main no longer needs padding-bottom because child tabs handle it */
+  main { padding-bottom: 0; } 
   header { padding: 0 1rem; }
   .floating-overlay { top: 0.5rem; left: 0.5rem; right: 0.5rem; }
-  .sos-trigger { bottom: 120px; right: 1.5rem; width: 56px; height: 56px; font-size: 0.8rem; }
 }
 
 /* --- Mobile Specific Optimization (< 600px) --- */
@@ -479,24 +490,26 @@ select:focus {
     width: 100%;
     margin: 0;
     padding: 1rem;
-    height: calc(100vh - 170px); /* Adjusted for taller header */
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    padding-bottom: 80px; /* Space for mobile nav */
+  }
+  
+  .tab-content#content-stalls,
+  .tab-content#content-staff { /* Added staff view to mobile scrollable tabs */
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: 90px;
   }
 
   .stalls-grid { padding: 1rem; gap: 1rem; }
   
   .floating-overlay { top: 0; padding: 0.5rem; }
 
-  /* Move SOS button to BOTTOM-LEFT on mobile to avoid Right-side UI overlap */
-  .sos-trigger {
-    bottom: 140px; 
-    left: 1.25rem; 
-    right: auto;
-    width: 58px; 
-    height: 58px; 
-    font-size: 0.85rem;
-    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
-    z-index: 210;
-  }
+  .stalls-grid { padding: 1rem; gap: 1rem; }
+  
+  .floating-overlay { top: 0; padding: 0.5rem; }
 }
 
 /* Map Label Component Styling */
