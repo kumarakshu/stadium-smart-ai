@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://unpkg.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com; connect-src 'self' https://generativelanguage.googleapis.com https://maps.googleapis.com; worker-src 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <title>SmartStadium AI | Unified Ecosystem</title>
     <link rel="stylesheet" href="style.css?v=1.9">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -19,11 +20,11 @@
                 <i data-lucide="building-2"></i>
                 <span>SmartStadium</span>
             </div>
-            <nav class="menu-list">
-                <li class="menu-item active" data-tab="map"><i data-lucide="map"></i> Map</li>
-                <li class="menu-item" data-tab="assistant"><i data-lucide="bot"></i> AI Assistant</li>
-                <li class="menu-item" data-tab="stalls"><i data-lucide="utensils"></i> Food Stalls</li>
-                <li class="menu-item" data-tab="staff"><i data-lucide="shield"></i> Staff Hub <span class="staff-badge">Internal</span></li>
+            <nav class="menu-list" role="tablist">
+                <li class="menu-item active" data-tab="map" role="tab" tabindex="0"><i data-lucide="map" aria-hidden="true"></i> Map</li>
+                <li class="menu-item" data-tab="assistant" role="tab" tabindex="-1"><i data-lucide="bot" aria-hidden="true"></i> AI Assistant</li>
+                <li class="menu-item" data-tab="stalls" role="tab" tabindex="-1"><i data-lucide="utensils" aria-hidden="true"></i> Food Stalls</li>
+                <li class="menu-item" data-tab="staff" role="tab" tabindex="-1"><i data-lucide="shield" aria-hidden="true"></i> Staff Hub <span class="staff-badge">Internal</span></li>
             </nav>
             <!-- Sidebar Footer Removed (Button moved to header) -->
         </aside>
@@ -59,7 +60,7 @@
                     <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <p style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Smart Suggestion</p>
-                            <div id="live-insight" style="font-size: 0.85rem; font-weight: 600;">Analyzing stadium crowd patterns...</div>
+                            <div id="live-insight" style="font-size: 0.85rem; font-weight: 600;" aria-live="polite">Analyzing stadium crowd patterns...</div>
                         </div>
                         <button class="btn btn-primary" id="sim-location" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Simulate Me</button>
                     </div>
@@ -71,7 +72,7 @@
             <section id="content-assistant" class="tab-content assistant-view" style="display: none;" role="region" aria-label="AI Assistant Chat">
                 <div class="chat-box">
                     <div id="chat-messages" class="chat-messages" aria-live="polite">
-                        <div class="msg msg-bot">
+                        <div class="msg msg-bot" tabindex="0">
                             👋 Hello! I'm your SmartStadium AI assistant. How can I help you navigate the venue today?
                         </div>
                     </div>
@@ -122,11 +123,11 @@
 
         </main>
 
-        <nav class="mobile-nav" role="navigation" aria-label="Main Navigation">
-            <div class="nav-item active" data-tab="map" aria-label="Map View" role="button"><i data-lucide="map"></i><span>Map</span></div>
-            <div class="nav-item" data-tab="assistant" aria-label="AI Assistant" role="button"><i data-lucide="bot"></i><span>AI</span></div>
-            <div class="nav-item" data-tab="stalls" aria-label="Food Stalls" role="button"><i data-lucide="utensils"></i><span>Food</span></div>
-            <div class="nav-item" data-tab="staff" aria-label="Staff Hub" role="button"><i data-lucide="shield"></i><span>Staff</span></div>
+        <nav class="mobile-nav" role="tablist" aria-label="Main Navigation">
+            <div class="nav-item active" data-tab="map" aria-label="Map View" role="tab" tabindex="0"><i data-lucide="map" aria-hidden="true"></i><span>Map</span></div>
+            <div class="nav-item" data-tab="assistant" aria-label="AI Assistant" role="tab" tabindex="-1"><i data-lucide="bot" aria-hidden="true"></i><span>AI</span></div>
+            <div class="nav-item" data-tab="stalls" aria-label="Food Stalls" role="tab" tabindex="-1"><i data-lucide="utensils" aria-hidden="true"></i><span>Food</span></div>
+            <div class="nav-item" data-tab="staff" aria-label="Staff Hub" role="tab" tabindex="-1"><i data-lucide="shield" aria-hidden="true"></i><span>Staff</span></div>
         </nav>
     </div>
 

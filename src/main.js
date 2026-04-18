@@ -56,7 +56,12 @@ function updateDynamicUI() {
         if (stadium) {
             const gates = stadium.zones.filter(z => z.type === 'entry').sort((a,b) => a.crowd - b.crowd);
             if (window.state.emergency?.active) {
-                insightEl.innerHTML = `<span style="color:#ef4444; font-weight:800;">🚨 SYSTEM ALERT: Evacuate via ${gates[0].name}</span>`;
+                insightEl.textContent = '';
+                const alertSpan = document.createElement('span');
+                alertSpan.style.color = '#ef4444';
+                alertSpan.style.fontWeight = '800';
+                alertSpan.textContent = `🚨 SYSTEM ALERT: Evacuate via ${gates[0].name}`;
+                insightEl.appendChild(alertSpan);
             } else if (gates.length > 0) {
                 insightEl.innerText = `💡 Proactive Tip: Use ${gates[0].name} for faster entry (${gates[0].crowd}% crowd).`;
                 
@@ -265,16 +270,10 @@ function setupChatbot() {
     };
 
     const appendMessage = (type, text) => {
-        // Enterprise Quality: Basic XSS Sanitization Strategy
-        const sanitizeHTML = (str) => {
-            const temp = document.createElement('div');
-            temp.textContent = str;
-            return temp.innerHTML;
-        };
-        
         const div = document.createElement('div');
         div.className = `msg msg-${type}`;
-        div.innerHTML = sanitizeHTML(text); // Secure injection
+        div.setAttribute('tabindex', '0'); // Accessibility
+        div.textContent = text; // 100% XSS proof native injection
         messages.appendChild(div);
         messages.scrollTop = messages.scrollHeight;
         return div;

@@ -82,3 +82,4 @@ const SimulationEngine = {
 if (CONFIG.SIMULATION_AUTO_START) {
     setTimeout(() => SimulationEngine.start(), 1500);
 }
+window.SimulationEngine = SimulationEngine;

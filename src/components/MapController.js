@@ -8,6 +8,8 @@ let zoneOverlays = [];
 let labelMarkers = [];
 let userMarker = null;
 let routingLine = null;
+let directionsService = null;
+let directionsRenderer = null;
 
 const MapController = {
     async init() {
@@ -106,22 +108,52 @@ const MapController = {
     drawEvacuationPath(dest) {
         if (!googleMap || !userMarker) return;
         if (routingLine) routingLine.setMap(null);
+        if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
 
-        routingLine = new google.maps.Polyline({
-            path: [userMarker.position, dest],
-            strokeColor: "#ef4444",
-            strokeWeight: 5,
-            strokeOpacity: 0.8,
-            map: googleMap,
-            icons: [{ icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW }, offset: '0%', repeat: '20px' }]
+        if (!directionsService) {
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: googleMap,
+                suppressMarkers: true,
+                polylineOptions: { strokeColor: "#ef4444", strokeWeight: 5 }
+            });
+        }
+
+        const request = {
+            origin: userMarker.position,
+            destination: dest,
+            travelMode: google.maps.TravelMode.WALKING
+        };
+
+        directionsService.route(request, (result, status) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+                directionsRenderer.setDirections(result);
+            } else {
+                // Fallback to straight Polyline if routing fails inside uncharted stadium zones
+                console.warn("Walking route not found, falling back to direct line.", status);
+                routingLine = new google.maps.Polyline({
+                    path: [userMarker.position, dest],
+                    strokeColor: "#ef4444",
+                    strokeWeight: 5,
+                    strokeOpacity: 0.8,
+                    map: googleMap,
+                    icons: [{ icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW }, offset: '0%', repeat: '20px' }]
+                });
+            }
         });
         
         // Pulse effect for emergency
         let count = 0;
         const interval = setInterval(() => {
-            if (!routingLine || !window.state.emergency.active) { clearInterval(interval); return; }
+            if (!window.state?.emergency?.active) {
+                clearInterval(interval);
+                if (routingLine) routingLine.setMap(null);
+                if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
+                return;
+            }
             count = (count + 1) % 2;
-            routingLine.setOptions({ strokeOpacity: count === 0 ? 0.3 : 0.8 });
+            if (routingLine) routingLine.setOptions({ strokeOpacity: count === 0 ? 0.3 : 0.8 });
+            if (directionsRenderer) directionsRenderer.setOptions({ polylineOptions: { strokeOpacity: count === 0 ? 0.3 : 0.8, strokeColor: "#ef4444", strokeWeight: 5 } });
         }, 500);
     }
 };

@@ -37,7 +37,13 @@ const AssistantController = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: `${systemPrompt}\n\nClient Query: ${query}` }] }]
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    contents: [{ role: "user", parts: [{ text: query }] }],
+                    generationConfig: {
+                        temperature: 0.6,
+                        maxOutputTokens: 300,
+                        topK: 40
+                    }
                 })
             });
             const data = await res.json();
