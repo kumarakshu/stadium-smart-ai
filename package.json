@@ -15,6 +15,7 @@
   "author": "Antigravity Dev",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^8.57.1",
     "jest": "^29.7.0"
   }
 }

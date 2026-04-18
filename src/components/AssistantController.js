@@ -4,15 +4,15 @@
  */
 
 const AssistantController = {
-    API_URL: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+    API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
 
     async getResponse(query) {
         const state = window.state;
         const currentId = document.getElementById('stadium-select')?.value || 'ahmedabad';
         const stadium = state?.stadiums?.find(s => s.id === currentId);
 
-        if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY.includes("YOUR_")) {
-            console.warn("AssistantController: Gemini API Key missing or placeholder. Using fallback engine.");
+        if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY.includes('YOUR_')) {
+            console.warn('AssistantController: Gemini API Key missing or placeholder. Using fallback engine.');
             const response = this.fallback(query, state, stadium);
             if (this.voiceEnabled) this.speak(response);
             return response;
@@ -20,25 +20,25 @@ const AssistantController = {
 
         const systemPrompt = `
             You are "SmartStadium AI Elite", the ultimate stadium concierge and logistical mastermind.
-            Venue: ${stadium?.name || "the stadium"}
+            Venue: ${stadium?.name || 'the stadium'}
             Live Stats: ${JSON.stringify({ zones: stadium?.zones || [], food: state?.stalls || [], emergency: state?.emergency || {} })}
 
             CONVICTION & SCOPE:
             1. PERSERVE LIVE DATA: Always use real-time crowd/wait times for navigation and food advice.
-            2. GENERAL KNOWLEDGE: Even if data is missing, answer questions about stadium life (Restrooms, Medical, Parking, Wi-Fi, Water) based on general ${stadium?.name || "stadium"} layouts.
+            2. GENERAL KNOWLEDGE: Even if data is missing, answer questions about stadium life (Restrooms, Medical, Parking, Wi-Fi, Water) based on general ${stadium?.name || 'stadium'} layouts.
             3. PREDICTIVE WARNINGS: If a gate is >70% crowd, warn the user about upcoming congestion.
             4. VOICE & STYLE: Be helpful, concise (max 2-3 sentences), and multi-lingual (Hinglish/Hindi/English).
             5. FALLBACK: Never say "I don't know" if it's about stadium amenities.
         `;
 
         try {
-            console.log("AssistantController: Fetching Gemini AI response...");
+            console.log('AssistantController: Fetching Gemini AI response...');
             const res = await fetch(`${this.API_URL}?key=${CONFIG.GEMINI_API_KEY}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     systemInstruction: { parts: [{ text: systemPrompt }] },
-                    contents: [{ role: "user", parts: [{ text: query }] }],
+                    contents: [{ role: 'user', parts: [{ text: query }] }],
                     generationConfig: {
                         temperature: 0.6,
                         maxOutputTokens: 300,
@@ -48,9 +48,9 @@ const AssistantController = {
             });
             const data = await res.json();
             
-            let responseText = "";
+            let responseText = '';
             if (data.error) {
-                console.error("AssistantController: Gemini API Error", data.error);
+                console.error('AssistantController: Gemini API Error', data.error);
                 responseText = this.fallback(query, state, stadium);
             } else if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
                 responseText = data.candidates[0].content.parts[0].text;
@@ -62,7 +62,7 @@ const AssistantController = {
             return responseText;
  
         } catch (err) {
-            console.error("AssistantController: Network Error", err);
+            console.error('AssistantController: Network Error', err);
             const fallbackRes = this.fallback(query, state, stadium);
             if (this.voiceEnabled) this.speak(fallbackRes);
             return fallbackRes;
@@ -87,7 +87,7 @@ const AssistantController = {
     listen(onResult, onError, onEnd) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
-            if (onError) onError("Speech Recognition not supported in this browser.");
+            if (onError) onError('Speech Recognition not supported in this browser.');
             return;
         }
 
@@ -116,47 +116,47 @@ const AssistantController = {
 
     fallback(query, state, stadium) {
         const q = query.toLowerCase();
-        if (state?.emergency?.active) return "🚨 EMERGENCY: Please follow the red pulse paths on your map for the safest exit.";
+        if (state?.emergency?.active) return '🚨 EMERGENCY: Please follow the red pulse paths on your map for the safest exit.';
         
         // Comprehensive Keyword Mapping (Hinglish Support)
         const intents = [
             {
-                keys: ["crowd", "gate", "bheed", "entry", "exit", "entry", "bahar", "khali"],
+                keys: ['crowd', 'gate', 'bheed', 'entry', 'exit', 'entry', 'bahar', 'khali'],
                 resp: () => {
                     const low = (stadium?.zones?.filter(z => z.type === 'entry') || []).sort((a,b) => a.crowd - b.crowd)[0];
-                    return low ? `Logical Advice: Use ${low.name} right now. It is only ${low.crowd}% full. If you wait 20 mins, it might get more crowded.` : "I suggest checking the Map for green color zones; they have the least crowd right now.";
+                    return low ? `Logical Advice: Use ${low.name} right now. It is only ${low.crowd}% full. If you wait 20 mins, it might get more crowded.` : 'I suggest checking the Map for green color zones; they have the least crowd right now.';
                 }
             },
             {
-                keys: ["food", "hungry", "stall", "khana", "bhuk", "bhook", "chai", "tea", "coffee", "pani", "water", "cafe"],
+                keys: ['food', 'hungry', 'stall', 'khana', 'bhuk', 'bhook', 'chai', 'tea', 'coffee', 'pani', 'water', 'cafe'],
                 resp: () => {
                     const items = state?.stalls || [];
                     const best = items.sort((a,b) => a.avg_wait - b.avg_wait)[0];
-                    if (q.includes("chai") || q.includes("tea") || q.includes("coffee")) {
-                        const tea = items.find(i => i.name.toLowerCase().includes("tea") || i.name.toLowerCase().includes("coffee"));
-                        return tea ? `Chai/Coffee is available at ${tea.name} (${tea.location}). Wait time is ${tea.avg_wait}m.` : "Tea stalls are located near the East and West stands.";
+                    if (q.includes('chai') || q.includes('tea') || q.includes('coffee')) {
+                        const tea = items.find(i => i.name.toLowerCase().includes('tea') || i.name.toLowerCase().includes('coffee'));
+                        return tea ? `Chai/Coffee is available at ${tea.name} (${tea.location}). Wait time is ${tea.avg_wait}m.` : 'Tea stalls are located near the East and West stands.';
                     }
                     return best ? `I recommend ${best.name} at ${best.location}. It's the fastest option right now (${best.avg_wait}m wait).` : "Please check the 'Food' tab for live wait times at all available stalls.";
                 }
             },
             {
-                keys: ["washroom", "toilet", "restroom", "tatti", "susu", "bathroom", "looo"],
+                keys: ['washroom', 'toilet', 'restroom', 'tatti', 'susu', 'bathroom', 'looo'],
                 resp: () => "Washrooms are located near every major Stand. There's a clean facility right behind the North Stand and next to Gate B."
             },
             {
-                keys: ["medical", "doctor", "hospital", "chot", "dard", "medicine", "dawai"],
-                resp: () => "Medical assistance is available at the First Aid center located near the Main Entry and Gate 3."
+                keys: ['medical', 'doctor', 'hospital', 'chot', 'dard', 'medicine', 'dawai'],
+                resp: () => 'Medical assistance is available at the First Aid center located near the Main Entry and Gate 3.'
             },
             {
-                keys: ["parking", "gaadi", "car", "bike", "cycle"],
-                resp: () => "Parking zones are outside Gate A and Gate 1. Follow the on-site signage for availability."
+                keys: ['parking', 'gaadi', 'car', 'bike', 'cycle'],
+                resp: () => 'Parking zones are outside Gate A and Gate 1. Follow the on-site signage for availability.'
             }
         ];
 
         const match = intents.find(intent => intent.keys.some(k => q.includes(k)));
         if (match) return match.resp();
 
-        return "I am your SmartStadium Assistant. I can help with crowd flow, food lines, washroom locations, or emergency paths. How can I help you have a better experience?";
+        return 'I am your SmartStadium Assistant. I can help with crowd flow, food lines, washroom locations, or emergency paths. How can I help you have a better experience?';
     }
 };
 

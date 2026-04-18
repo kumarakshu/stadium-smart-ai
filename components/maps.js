@@ -10,11 +10,11 @@ let routingLine = null;
 
 const StadiumMap = {
     init() {
-        console.log("StadiumMap: Initializing...");
+        console.log('StadiumMap: Initializing...');
         const mapBox = document.getElementById('map-box');
         if (!mapBox) return;
 
-        if (!CONFIG.GOOGLE_MAPS_API_KEY || CONFIG.GOOGLE_MAPS_API_KEY.includes("YOUR_")) {
+        if (!CONFIG.GOOGLE_MAPS_API_KEY || CONFIG.GOOGLE_MAPS_API_KEY.includes('YOUR_')) {
             mapBox.innerHTML = 
                 `<div style="height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:2rem; text-align:center;">
                     <i data-lucide="map-pin-off" style="width:48px; height:48px; color:var(--text-secondary);"></i>
@@ -93,10 +93,10 @@ const StadiumMap = {
                 },
                 label: {
                     text: `${zone.name}\n${zone.crowd}%`,
-                    color: "white",
-                    fontWeight: "bold",
-                    fontSize: "11px",
-                    className: "map-label" // Can be styled in CSS if needed
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '11px',
+                    className: 'map-label' // Can be styled in CSS if needed
                 }
             });
 
@@ -117,12 +117,12 @@ const StadiumMap = {
                 icon: {
                     path: google.maps.SymbolPath.CIRCLE,
                     scale: 10,
-                    fillColor: "#2563eb",
+                    fillColor: '#2563eb',
                     fillOpacity: 1,
-                    strokeColor: "white",
+                    strokeColor: 'white',
                     strokeWeight: 3,
                 },
-                title: "You",
+                title: 'You',
                 zIndex: 999
             });
         } else {
@@ -142,7 +142,7 @@ const StadiumMap = {
         routingLine = new google.maps.Polyline({
             path: [userMarker.getPosition(), destinationCoords],
             geodesic: true,
-            strokeColor: "#2563eb",
+            strokeColor: '#2563eb',
             strokeOpacity: 1.0,
             strokeWeight: 4,
             map: googleMap,
@@ -183,10 +183,10 @@ const StadiumMap = {
 };
 
 window.initGoogleMap = () => {
-    console.log("SmartStadium Maps: API Loaded. Checking state...");
+    console.log('SmartStadium Maps: API Loaded. Checking state...');
 
     if (!window.state || !window.state.stadiums || window.state.stadiums.length === 0) {
-        console.warn("SmartStadium Maps: State not ready, retrying in 500ms...");
+        console.warn('SmartStadium Maps: State not ready, retrying in 500ms...');
         setTimeout(window.initGoogleMap, 500);
         return;
     }
@@ -196,7 +196,7 @@ window.initGoogleMap = () => {
     const stadium = window.state.stadiums.find(s => s.id === currentStadiumId);
 
     if (!stadium) {
-        console.error("SmartStadium Maps: No stadium found for", currentStadiumId);
+        console.error('SmartStadium Maps: No stadium found for', currentStadiumId);
         return;
     }
 
@@ -207,11 +207,11 @@ window.initGoogleMap = () => {
         gestureHandling: 'greedy',
         tilt: 45,
         styles: [
-            { "featureType": "all", "elementType": "labels.text.fill", "stylers": [{ "color": "#ffffff" }] }
+            { 'featureType': 'all', 'elementType': 'labels.text.fill', 'stylers': [{ 'color': '#ffffff' }] }
         ]
     });
 
-    console.log("SmartStadium Maps: Map Rendered for", stadium.name);
+    console.log('SmartStadium Maps: Map Rendered for', stadium.name);
     StadiumMap.renderZones(window.state);
     
     const box = document.getElementById('map-box');

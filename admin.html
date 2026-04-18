@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://firebase.googleapis.com; worker-src 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <title>SmartStadium AI | Control Command</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -125,5 +127,24 @@
     <script src="src/data/config.js?v=2.0"></script>
     <script src="src/engine/state.js?v=2.0"></script>
     <script src="src/admin.js?v=2.0"></script>
+
+    <!-- Google Services Active Integration: Firebase Authentication & Analytics -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            projectId: "promptai-493007",
+            appId: "1:123456789:web:abcdef12345678",
+            apiKey: "AIzaSy_MOCK_FIREBASE_KEY_FOR_TESTS",
+            measurementId: "G-SMARTCITY1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        window.firebaseIntegration = { app, analytics, auth };
+    </script>
 </body>
 </html>

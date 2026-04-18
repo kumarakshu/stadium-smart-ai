@@ -5,7 +5,7 @@
 let activeTab = 'map';
 
 async function init() {
-    console.log("SmartStadium: Initializing Premium App...");
+    console.log('SmartStadium: Initializing Premium App...');
     
     // 1. Initial State Load
     const saved = localStorage.getItem('smartstadium_data');
@@ -17,7 +17,7 @@ async function init() {
             window.state = await res.json();
             saveState();
         } catch (err) {
-            console.error("Failed to load mock data:", err);
+            console.error('Failed to load mock data:', err);
             window.state = { stadiums: [], stalls: [], emergency: { active: false } };
         }
     }
@@ -136,7 +136,7 @@ function renderStaff() {
     stadium.zones.forEach(zone => {
         const statusColor = zone.crowd < 30 ? 'var(--low)' : (zone.crowd < 70 ? 'var(--medium)' : 'var(--high)');
         const div = document.createElement('div');
-        div.style = "margin-bottom:1.25rem; padding:1.25rem; background:var(--bg-3); border-radius:var(--radius-md); border:1px solid var(--border);";
+        div.style = 'margin-bottom:1.25rem; padding:1.25rem; background:var(--bg-3); border-radius:var(--radius-md); border:1px solid var(--border);';
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
                 <span style="font-size:0.9rem; font-weight:700;">${zone.name}</span>
@@ -158,7 +158,7 @@ window.updateZone = (stadiumId, zoneId, val) => {
     if (zone) zone.crowd = parseInt(val);
     saveState();
     window.dispatchEvent(new CustomEvent('simulation_update', { detail: window.state }));
-}
+};
 
 function setupNavigation() {
     // Stadium Switch
@@ -185,8 +185,8 @@ function setupNavigation() {
         item.onclick = () => {
             const nextTab = item.dataset.tab;
             if (nextTab === 'staff') {
-                const pin = prompt("Staff Authentication Required (PIN):");
-                if (pin !== '1234') { return alert("Unauthorized access!"); }
+                const pin = prompt('Staff Authentication Required (PIN):');
+                if (pin !== '1234') { return alert('Unauthorized access!'); }
             }
             activeTab = nextTab;
             localStorage.setItem('smartstadium_active_tab', activeTab);
@@ -238,23 +238,23 @@ function setupStaffControls() {
     const triggerBtn = document.getElementById('trigger-evac');
     if (triggerBtn) {
         triggerBtn.onclick = () => {
-            if(confirm("ALERT: Broadcast stadium-wide evacuation?")) {
-                window.state.emergency = { active: true, message: "EMERGENCY: EVACUATE NOW" };
+            if(confirm('ALERT: Broadcast stadium-wide evacuation?')) {
+                window.state.emergency = { active: true, message: 'EMERGENCY: EVACUATE NOW' };
                 saveState();
                 window.dispatchEvent(new CustomEvent('simulation_update', { detail: window.state }));
             }
-        }
+        };
     }
 
     const clearBtn = document.getElementById('clear-evac');
     if (clearBtn) {
         clearBtn.onclick = () => {
-            if(confirm("End emergency mode?")) {
-                window.state.emergency = { active: false, message: "" };
+            if(confirm('End emergency mode?')) {
+                window.state.emergency = { active: false, message: '' };
                 saveState();
                 window.dispatchEvent(new CustomEvent('simulation_update', { detail: window.state }));
             }
-        }
+        };
     }
 }
 
@@ -262,15 +262,15 @@ function setupSOS() {
     const btn = document.getElementById('sos-btn');
     if (!btn) return;
     btn.onclick = () => {
-        if(confirm("Emergency! Send SOS to command center?")) {
-            alert("Emergency broadcast sent. AI is calculating your exit path.");
+        if(confirm('Emergency! Send SOS to command center?')) {
+            alert('Emergency broadcast sent. AI is calculating your exit path.');
             if (window.state) {
-                window.state.emergency = { active: true, message: "EMERGENCY: EVACUATE NOW" };
+                window.state.emergency = { active: true, message: 'EMERGENCY: EVACUATE NOW' };
                 saveState();
                 window.dispatchEvent(new CustomEvent('simulation_update', { detail: window.state }));
             }
         }
-    }
+    };
 }
 
 window.joinStall = (id) => alert("Spot Reserved! Check the 'AI Assistant' for your turn notifications.");

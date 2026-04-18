@@ -6,12 +6,12 @@
 window.state = {
     stadiums: [],
     stalls: [],
-    emergency: { active: false, message: "" }
+    emergency: { active: false, message: '' }
 };
 
 const StateManager = {
     async init() {
-        console.log("StateManager: Initializing...");
+        console.log('StateManager: Initializing...');
         const saved = localStorage.getItem('smartstadium_data');
         
         if (saved) {
@@ -29,7 +29,7 @@ const StateManager = {
             window.state = await res.json();
             this.save();
         } catch (err) {
-            console.error("StateManager: Failed to load mock data:", err);
+            console.error('StateManager: Failed to load mock data:', err);
             // Fallback empty state
             window.state = { stadiums: [], stalls: [], emergency: { active: false } };
         }
@@ -51,7 +51,7 @@ const StateManager = {
         }
     },
 
-    setEmergency(active, message = "") {
+    setEmergency(active, message = '') {
         window.state.emergency = { active, message };
         this.save();
         this.broadcast();

@@ -54,10 +54,10 @@ describe('Simulation Engine', () => {
 
     it('should return correct phase names', () => {
         global.window.SimulationEngine.currentPhase = 0;
-        expect(global.window.SimulationEngine.getPhaseName()).toContain("Entry");
+        expect(global.window.SimulationEngine.getPhaseName()).toContain('Entry');
         global.window.SimulationEngine.currentPhase = 1;
-        expect(global.window.SimulationEngine.getPhaseName()).toContain("Match");
+        expect(global.window.SimulationEngine.getPhaseName()).toContain('Match');
         global.window.SimulationEngine.currentPhase = 2;
-        expect(global.window.SimulationEngine.getPhaseName()).toContain("Break");
+        expect(global.window.SimulationEngine.getPhaseName()).toContain('Break');
     });
 });

@@ -8,7 +8,7 @@ const SimulationEngine = {
     phaseTick: 0,
 
     start() {
-        console.log("Simulation Engine: Starting Smart Cycle Logic...");
+        console.log('Simulation Engine: Starting Smart Cycle Logic...');
         
         // 1. Restore State
         if (!window.state) {
@@ -20,7 +20,7 @@ const SimulationEngine = {
         const savedPhase = localStorage.getItem('smartstadium_sim_phase');
         if (savedPhase !== null) {
             this.currentPhase = parseInt(savedPhase);
-            this.phaseTick = parseInt(localStorage.getItem('smartstadium_sim_tick') || "0");
+            this.phaseTick = parseInt(localStorage.getItem('smartstadium_sim_tick') || '0');
             console.log(`Restored Simulation Phase: ${this.currentPhase} at tick ${this.phaseTick}`);
         }
         
@@ -86,7 +86,7 @@ const SimulationEngine = {
     },
 
     getPhaseName() {
-        return ["Crowd Inflow (Entry)", "Match in Progress", "Intermission (Break)"][this.currentPhase];
+        return ['Crowd Inflow (Entry)', 'Match in Progress', 'Intermission (Break)'][this.currentPhase];
     }
 };
 

@@ -56,9 +56,9 @@ describe('SmartStadium StateManager', () => {
     });
 
     it('should successfully trigger an emergency broadcast', () => {
-        window.StateManager.setEmergency(true, "EVACUATE");
+        window.StateManager.setEmergency(true, 'EVACUATE');
         expect(window.state.emergency.active).toBe(true);
-        expect(window.state.emergency.message).toBe("EVACUATE");
+        expect(window.state.emergency.message).toBe('EVACUATE');
         expect(global.window.dispatchEvent).toHaveBeenCalled();
     });
 

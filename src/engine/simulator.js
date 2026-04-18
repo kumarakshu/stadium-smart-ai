@@ -10,7 +10,7 @@ const SimulationEngine = {
     worker: null,
 
     start() {
-        console.log("Simulation Engine: Starting Smart Cycle Logic (Worker Mode)...");
+        console.log('Simulation Engine: Starting Smart Cycle Logic (Worker Mode)...');
         
         // 1. Restore State
         if (!window.state) {
@@ -22,7 +22,7 @@ const SimulationEngine = {
         const savedPhase = localStorage.getItem('smartstadium_sim_phase');
         if (savedPhase !== null) {
             this.currentPhase = parseInt(savedPhase);
-            this.phaseTick = parseInt(localStorage.getItem('smartstadium_sim_tick') || "0");
+            this.phaseTick = parseInt(localStorage.getItem('smartstadium_sim_tick') || '0');
             console.log(`Restored Simulation Phase: ${this.currentPhase} at tick ${this.phaseTick}`);
         }
 
@@ -41,10 +41,10 @@ const SimulationEngine = {
                     window.dispatchEvent(new CustomEvent('simulation_update', { detail: state }));
                 };
             } catch (err) {
-                console.error("Worker initialization failed, fallback disabled for performance.", err);
+                console.error('Worker initialization failed, fallback disabled for performance.', err);
             }
         } else {
-            console.warn("Web Workers not supported in this browser.");
+            console.warn('Web Workers not supported in this browser.');
         }
         
         // Run simulation tick
@@ -75,7 +75,7 @@ const SimulationEngine = {
     },
 
     getPhaseName() {
-        return ["Crowd Inflow (Entry)", "Match in Progress", "Intermission (Break)"][this.currentPhase];
+        return ['Crowd Inflow (Entry)', 'Match in Progress', 'Intermission (Break)'][this.currentPhase];
     }
 };
 

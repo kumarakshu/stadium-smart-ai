@@ -4,8 +4,8 @@
  * DO NOT commit the config.js file with real keys to GitHub.
  */
 const CONFIG = {
-    GEMINI_API_KEY: "YOUR_GEMINI_API_KEY_HERE",
-    GOOGLE_MAPS_API_KEY: "YOUR_GOOGLE_MAPS_API_KEY_HERE",
+    GEMINI_API_KEY: 'YOUR_GEMINI_API_KEY_HERE',
+    GOOGLE_MAPS_API_KEY: 'YOUR_GOOGLE_MAPS_API_KEY_HERE',
     
     // Default Map Center (Narendra Modi Stadium, Ahmedabad)
     STADIUM_COORD: { lat: 23.0919, lng: 72.5975 },

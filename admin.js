@@ -50,14 +50,14 @@ function renderMap() {
         
         ${state.zones.map(zone => {
             const color = zone.crowd < 30 ? 'var(--low)' : (zone.crowd < 70 ? 'var(--medium)' : 'var(--high)');
-            let path = "";
-            if (zone.id === 'north-stand') path = "M 45 5 L 115 5 L 120 20 L 40 20 Z";
-            if (zone.id === 'south-stand') path = "M 40 70 L 120 70 L 115 85 L 45 85 Z";
-            if (zone.id === 'west-stand') path = "M 5 20 L 35 25 L 35 65 L 5 70 Z";
-            if (zone.id === 'east-stand') path = "M 125 25 L 155 20 L 155 70 L 125 65 Z";
-            if (zone.id === 'gate-a') path = "M 70 0 L 90 0 L 90 4 L 70 4 Z";
-            if (zone.id === 'gate-b') path = "M 70 86 L 90 86 L 90 90 L 70 90 Z";
-            if (zone.id === 'food-court') path = "M 10 75 L 40 75 L 40 85 L 10 85 Z";
+            let path = '';
+            if (zone.id === 'north-stand') path = 'M 45 5 L 115 5 L 120 20 L 40 20 Z';
+            if (zone.id === 'south-stand') path = 'M 40 70 L 120 70 L 115 85 L 45 85 Z';
+            if (zone.id === 'west-stand') path = 'M 5 20 L 35 25 L 35 65 L 5 70 Z';
+            if (zone.id === 'east-stand') path = 'M 125 25 L 155 20 L 155 70 L 125 65 Z';
+            if (zone.id === 'gate-a') path = 'M 70 0 L 90 0 L 90 4 L 70 4 Z';
+            if (zone.id === 'gate-b') path = 'M 70 86 L 90 86 L 90 90 L 70 90 Z';
+            if (zone.id === 'food-court') path = 'M 10 75 L 40 75 L 40 85 L 10 85 Z';
 
             return `<path d="${path}" fill="${color}" opacity="0.8" stroke="white" stroke-width="0.5" />`;
         }).join('')}
@@ -128,7 +128,7 @@ function setupBroadcasts() {
         state.emergency = {
             active: true,
             type: 'ADMIN_BROADCAST',
-            message: "MANDATORY EVACUATION: Please exit via the nearest gate calmly. Staff are here to assist."
+            message: 'MANDATORY EVACUATION: Please exit via the nearest gate calmly. Staff are here to assist.'
         };
         saveState();
         refreshUI();
@@ -138,7 +138,7 @@ function setupBroadcasts() {
         state.emergency = {
             active: false,
             type: null,
-            message: ""
+            message: ''
         };
         saveState();
         refreshUI();

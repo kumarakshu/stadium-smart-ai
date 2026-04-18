@@ -16,7 +16,7 @@ const MapController = {
         const mapBox = document.getElementById('map-box');
         if (!mapBox) return;
 
-        if (!CONFIG.GOOGLE_MAPS_API_KEY || CONFIG.GOOGLE_MAPS_API_KEY.includes("YOUR_")) {
+        if (!CONFIG.GOOGLE_MAPS_API_KEY || CONFIG.GOOGLE_MAPS_API_KEY.includes('YOUR_')) {
             mapBox.innerHTML = `<p style="padding:2rem; text-align:center;">API Key Required</p>`;
             return;
         }
@@ -97,7 +97,7 @@ const MapController = {
                  map: googleMap,
                  position: coords,
                  content: userPin,
-                 title: "You are here"
+                 title: 'You are here'
              });
         } else {
             userMarker.position = coords;
@@ -115,7 +115,7 @@ const MapController = {
             directionsRenderer = new google.maps.DirectionsRenderer({
                 map: googleMap,
                 suppressMarkers: true,
-                polylineOptions: { strokeColor: "#ef4444", strokeWeight: 5 }
+                polylineOptions: { strokeColor: '#ef4444', strokeWeight: 5 }
             });
         }
 
@@ -130,10 +130,10 @@ const MapController = {
                 directionsRenderer.setDirections(result);
             } else {
                 // Fallback to straight Polyline if routing fails inside uncharted stadium zones
-                console.warn("Walking route not found, falling back to direct line.", status);
+                console.warn('Walking route not found, falling back to direct line.', status);
                 routingLine = new google.maps.Polyline({
                     path: [userMarker.position, dest],
-                    strokeColor: "#ef4444",
+                    strokeColor: '#ef4444',
                     strokeWeight: 5,
                     strokeOpacity: 0.8,
                     map: googleMap,
@@ -153,7 +153,7 @@ const MapController = {
             }
             count = (count + 1) % 2;
             if (routingLine) routingLine.setOptions({ strokeOpacity: count === 0 ? 0.3 : 0.8 });
-            if (directionsRenderer) directionsRenderer.setOptions({ polylineOptions: { strokeOpacity: count === 0 ? 0.3 : 0.8, strokeColor: "#ef4444", strokeWeight: 5 } });
+            if (directionsRenderer) directionsRenderer.setOptions({ polylineOptions: { strokeOpacity: count === 0 ? 0.3 : 0.8, strokeColor: '#ef4444', strokeWeight: 5 } });
         }, 500);
     }
 };

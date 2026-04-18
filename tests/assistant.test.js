@@ -35,34 +35,34 @@ describe('Assistant Controller Fallbacks', () => {
 
     it('should return emergency response if emergency is active', () => {
         state.emergency.active = true;
-        const res = global.window.AssistantController.fallback("where is the food?", state, stadium);
-        expect(res).toContain("EMERGENCY");
+        const res = global.window.AssistantController.fallback('where is the food?', state, stadium);
+        expect(res).toContain('EMERGENCY');
         state.emergency.active = false;
     });
 
     it('should return shortest gate for crowd queries', () => {
-        const res = global.window.AssistantController.fallback("which gate is empty?", state, stadium);
-        expect(res).toContain("Gate 1"); // Because Gate 1 has crowd=10
-        expect(res).not.toContain("Gate 2");
+        const res = global.window.AssistantController.fallback('which gate is empty?', state, stadium);
+        expect(res).toContain('Gate 1'); // Because Gate 1 has crowd=10
+        expect(res).not.toContain('Gate 2');
     });
 
     it('should return shortest wait food stall for general food queries', () => {
-        const res = global.window.AssistantController.fallback("I am hungry", state, stadium);
-        expect(res).toContain("Tea Point"); // Because wait is 5
+        const res = global.window.AssistantController.fallback('I am hungry', state, stadium);
+        expect(res).toContain('Tea Point'); // Because wait is 5
     });
 
     it('should return tea stall explicitly for chai queries', () => {
-        const res = global.window.AssistantController.fallback("need tea", state, stadium);
-        expect(res).toContain("Tea Point");
+        const res = global.window.AssistantController.fallback('need tea', state, stadium);
+        expect(res).toContain('Tea Point');
     });
 
     it('should identify washroom intents', () => {
-        const res = global.window.AssistantController.fallback("where is the washroom?", state, stadium);
-        expect(res).toContain("Washrooms are located");
+        const res = global.window.AssistantController.fallback('where is the washroom?', state, stadium);
+        expect(res).toContain('Washrooms are located');
     });
 
     it('should fallback gracefully for unknown queries', () => {
-        const res = global.window.AssistantController.fallback("random random random", state, stadium);
-        expect(res).toContain("I am your SmartStadium Assistant");
+        const res = global.window.AssistantController.fallback('random random random', state, stadium);
+        expect(res).toContain('I am your SmartStadium Assistant');
     });
 });

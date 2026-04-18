@@ -6,7 +6,7 @@
 let activeTab = 'map';
 
 async function initApp() {
-    console.log("SmartStadium: Booting System...");
+    console.log('SmartStadium: Booting System...');
     
     // 1. Initialize State Persistence
     if (window.StateManager) await window.StateManager.init();
@@ -69,12 +69,12 @@ function updateDynamicUI() {
                 const crowdedGates = stadium.zones.filter(z => z.type === 'entry' && z.crowd > 85);
                 if (crowdedGates.length > 0 && !window.state.alertSent) {
                     window.state.alertSent = true;
-                    if (Notification.permission === "granted") {
-                        new Notification("SmartStadium AI Alert", {
+                    if (Notification.permission === 'granted') {
+                        new Notification('SmartStadium AI Alert', {
                             body: `Predictive Alert: ${crowdedGates[0].name} is reaching maximum capacity. Expect delays.`,
                             icon: 'favicon.png'
                         });
-                    } else if (Notification.permission !== "denied") {
+                    } else if (Notification.permission !== 'denied') {
                         Notification.requestPermission();
                     }
                 }
@@ -124,7 +124,7 @@ function renderStaff() {
     stadium.zones.forEach(zone => {
         const div = document.createElement('div');
         div.className = 'staff-control-card';
-        div.style = "margin-bottom:1rem; padding:1rem; background:var(--bg-3); border-radius:var(--radius-md);";
+        div.style = 'margin-bottom:1rem; padding:1rem; background:var(--bg-3); border-radius:var(--radius-md);';
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
                 <span style="font-size:0.85rem; font-weight:700;">${zone.name}</span>
@@ -153,8 +153,8 @@ function setupNavigation() {
         item.onclick = () => {
              const target = item.dataset.tab;
              if (target === 'staff') {
-                const pin = prompt("Staff PIN:");
-                if (pin !== '1234') return alert("Access denied.");
+                const pin = prompt('Staff PIN:');
+                if (pin !== '1234') return alert('Access denied.');
              }
              activeTab = target;
              localStorage.setItem('smartstadium_active_tab', activeTab);
@@ -218,8 +218,8 @@ function setupTheme() {
 function setupSOS() {
     const btn = document.getElementById('sos-btn');
     btn.onclick = () => {
-        if (confirm("Emergency SOS?")) {
-            window.StateManager.setEmergency(true, "SOS TRIGGERED");
+        if (confirm('Emergency SOS?')) {
+            window.StateManager.setEmergency(true, 'SOS TRIGGERED');
             const stadium = window.state.stadiums.find(s => s.id === document.getElementById('stadium-select').value);
             const exit = stadium.zones.find(z => z.type === 'entry');
             const exitPos = { lat: stadium.coords.lat + (StadiumOffsets[exit.id]?.lat || 0), lng: stadium.coords.lng + (StadiumOffsets[exit.id]?.lng || 0) };
@@ -230,10 +230,10 @@ function setupSOS() {
 
 function setupStaffControls() {
     document.getElementById('trigger-evac').onclick = () => {
-        if (confirm("Evacuate Stadium?")) window.StateManager.setEmergency(true, "EVACUATE NOW");
+        if (confirm('Evacuate Stadium?')) window.StateManager.setEmergency(true, 'EVACUATE NOW');
     };
     document.getElementById('clear-evac').onclick = () => {
-        if (confirm("Clear Emergency?")) window.StateManager.setEmergency(false, "");
+        if (confirm('Clear Emergency?')) window.StateManager.setEmergency(false, '');
     };
 }
 
@@ -295,8 +295,8 @@ function setupChatbot() {
                     handleSend(transcript);
                 },
                 (err) => {
-                    console.error("Speech Error:", err);
-                    alert("Voice recognition error: " + err);
+                    console.error('Speech Error:', err);
+                    alert('Voice recognition error: ' + err);
                 },
                 () => {
                     // Reset UI
@@ -309,6 +309,6 @@ function setupChatbot() {
 }
 
 // Global scope joinStall
-window.joinStall = (id) => alert("Reservation confirmed. AI will notify you when your turn is near.");
+window.joinStall = (id) => alert('Reservation confirmed. AI will notify you when your turn is near.');
 
 document.addEventListener('DOMContentLoaded', initApp);
