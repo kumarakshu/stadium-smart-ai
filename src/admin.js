@@ -13,7 +13,7 @@ async function init() {
     setupBroadcasts();
     
     // Listen for Sync
-    window.addEventListener('simulation_update', (e) => {
+    window.addEventListener('simulation_update', () => {
         refreshUI();
     });
 

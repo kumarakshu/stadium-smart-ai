@@ -42,6 +42,18 @@ async function initApp() {
     // 4. Initial Render
     updateDynamicUI();
     if (typeof lucide !== 'undefined') lucide.createIcons();
+    
+    // Active Analytics: App Launch
+    logAnalyticsEvent('app_launch', { platform: 'web', version: '2.0-rank1' });
+}
+
+function logAnalyticsEvent(name, params = {}) {
+    console.log(`[Analytics] Logging: ${name}`, params);
+    if (window.firebaseIntegration && window.firebaseIntegration.analytics) {
+        import('https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js').then(mod => {
+            mod.logEvent(window.firebaseIntegration.analytics, name, params);
+        });
+    }
 }
 
 /** UI Synchronization Logic **/
@@ -142,11 +154,13 @@ function setupNavigation() {
         localStorage.setItem('smartstadium_active_stadium', e.target.value);
         if (window.MapController) window.MapController.setStadium(e.target.value, window.state);
         updateDynamicUI();
+        logAnalyticsEvent('venue_switch', { venue: e.target.value });
     };
 
     document.getElementById('sim-location').onclick = () => {
         const stadium = window.state.stadiums.find(s => s.id === document.getElementById('stadium-select').value);
         if (window.MapController) window.MapController.simulateUser({ lat: stadium.coords.lat - 0.001, lng: stadium.coords.lng });
+        logAnalyticsEvent('simulate_user', { stadium: stadium.id });
     };
 
     document.querySelectorAll('.menu-item, .nav-item').forEach(item => {
@@ -183,7 +197,7 @@ function syncTabUI() {
 function setupVoiceAssistant() {
     const toggle = document.getElementById('voice-toggle');
     const status = document.getElementById('voice-status');
-    const icon = document.getElementById('voice-icon');
+    // const icon = document.getElementById('voice-icon');
     
     // Restore
     const isEnabled = localStorage.getItem('smartstadium_voice') === 'true';
@@ -224,6 +238,7 @@ function setupSOS() {
             const exit = stadium.zones.find(z => z.type === 'entry');
             const exitPos = { lat: stadium.coords.lat + (StadiumOffsets[exit.id]?.lat || 0), lng: stadium.coords.lng + (StadiumOffsets[exit.id]?.lng || 0) };
             if (window.MapController) window.MapController.drawEvacuationPath(exitPos);
+            logAnalyticsEvent('sos_triggered', { stadium: stadium.id, severity: 'high' });
         }
     };
 }
@@ -244,10 +259,11 @@ function setupChatbot() {
     const messages = document.getElementById('chat-messages');
 
     if (!input || !sendBtn || !messages) return;
-
-    const handleSend = async (overrideQuery = null) => {
+    const handleSend = async (overrideQuery) => {
         const query = overrideQuery || input.value.trim();
         if (!query) return;
+
+        logAnalyticsEvent('chat_interaction', { query_length: query.length });
 
         // Add user message
         appendMessage('user', query);
@@ -309,6 +325,6 @@ function setupChatbot() {
 }
 
 // Global scope joinStall
-window.joinStall = (id) => alert('Reservation confirmed. AI will notify you when your turn is near.');
+window.joinStall = () => alert('Reservation confirmed. AI will notify you when your turn is near.');
 
 document.addEventListener('DOMContentLoaded', initApp);

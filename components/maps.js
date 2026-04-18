@@ -220,6 +220,6 @@ window.initGoogleMap = () => {
     }
 };
 
-window.addEventListener('simulation_update', (e) => {
+window.addEventListener('simulation_update', () => {
     if (window.state && StadiumMap) StadiumMap.renderZones(window.state);
 });

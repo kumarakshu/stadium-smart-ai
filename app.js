@@ -273,6 +273,6 @@ function setupSOS() {
     };
 }
 
-window.joinStall = (id) => alert("Spot Reserved! Check the 'AI Assistant' for your turn notifications.");
+window.joinStall = () => alert("Spot Reserved! Check the 'AI Assistant' for your turn notifications.");
 
 document.addEventListener('DOMContentLoaded', init);
