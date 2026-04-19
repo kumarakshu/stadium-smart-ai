@@ -31,12 +31,18 @@ const { SimulationEngine } = require('../src/engine/simulator');
 describe('Simulation Engine', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.useFakeTimers();
         SimulationEngine.currentPhase = 0;
         SimulationEngine.phaseTick = 0;
         SimulationEngine.worker = null;
         global.window.SimulationEngine = SimulationEngine;
         global.window.state = { stadiums: [], stalls: [], emergency: { active: false } };
         global.localStorage.getItem.mockReturnValue(null);
+    });
+
+    afterEach(() => {
+        jest.clearAllTimers();
+        jest.useRealTimers();
     });
 
     it('should increment phaseTick on tick()', () => {
