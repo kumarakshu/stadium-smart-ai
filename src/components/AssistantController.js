@@ -161,3 +161,8 @@ const AssistantController = {
 };
 
 window.AssistantController = AssistantController;
+
+// Allow Jest to instrument this file for coverage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { AssistantController };
+}

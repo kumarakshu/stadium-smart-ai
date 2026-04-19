@@ -90,26 +90,71 @@ function updateDynamicUI() {
 function renderStalls() {
     const container = document.getElementById('stall-container');
     if (!container || !window.state.stalls) return;
-    container.innerHTML = '';
+    container.textContent = '';
     
     window.state.stalls.forEach(stall => {
         const color = stall.avg_wait < 10 ? '#22c55e' : (stall.avg_wait < 25 ? '#eab308' : '#ef4444');
         const card = document.createElement('div');
         card.className = 'stall-card';
-        card.innerHTML = `
-            <div style="display:flex; justify-content:space-between;">
-                <div>
-                   <h4 style="font-size:1.1rem;">${stall.name}</h4>
-                   <p style="font-size:0.75rem; color:var(--text-2);">${stall.location}</p>
-                </div>
-                <span class="badge" style="background:${color}22; color:${color}; border:1px solid ${color}44;">${stall.avg_wait}m wait</span>
-            </div>
-            <div class="wait-bar-container"><div class="wait-bar" style="width:${Math.min(100, (stall.avg_wait/40)*100)}%; background:${color};"></div></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
-                <span style="font-size:0.7rem; color:var(--text-2);">Queue: ${stall.queue_length}p</span>
-                <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="joinStall('${stall.id}')">Reserve</button>
-            </div>
-        `;
+        
+        const topDiv = document.createElement('div');
+        topDiv.style.display = 'flex';
+        topDiv.style.justifyContent = 'space-between';
+        
+        const textDiv = document.createElement('div');
+        const h4 = document.createElement('h4');
+        h4.style.fontSize = '1.1rem';
+        h4.textContent = stall.name;
+        const p = document.createElement('p');
+        p.style.fontSize = '0.75rem';
+        p.style.color = 'var(--text-2)';
+        p.textContent = stall.location;
+        textDiv.appendChild(h4);
+        textDiv.appendChild(p);
+        
+        const badgeSpan = document.createElement('span');
+        badgeSpan.className = 'badge';
+        badgeSpan.style.background = `${color}22`;
+        badgeSpan.style.color = color;
+        badgeSpan.style.border = `1px solid ${color}44`;
+        badgeSpan.textContent = `${stall.avg_wait}m wait`;
+        
+        topDiv.appendChild(textDiv);
+        topDiv.appendChild(badgeSpan);
+        
+        const barCont = document.createElement('div');
+        barCont.className = 'wait-bar-container';
+        const bar = document.createElement('div');
+        bar.className = 'wait-bar';
+        bar.style.width = `${Math.min(100, (stall.avg_wait/40)*100)}%`;
+        bar.style.background = color;
+        barCont.appendChild(bar);
+        
+        const bottomDiv = document.createElement('div');
+        bottomDiv.style.display = 'flex';
+        bottomDiv.style.justifyContent = 'space-between';
+        bottomDiv.style.alignItems = 'center';
+        bottomDiv.style.marginTop = '0.5rem';
+        
+        const queueSpan = document.createElement('span');
+        queueSpan.style.fontSize = '0.7rem';
+        queueSpan.style.color = 'var(--text-2)';
+        queueSpan.textContent = `Queue: ${stall.queue_length}p`;
+        
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-primary';
+        btn.style.padding = '0.4rem 0.8rem';
+        btn.style.fontSize = '0.75rem';
+        btn.onclick = () => window.joinStall(stall.id);
+        btn.textContent = 'Reserve';
+        
+        bottomDiv.appendChild(queueSpan);
+        bottomDiv.appendChild(btn);
+        
+        card.appendChild(topDiv);
+        card.appendChild(barCont);
+        card.appendChild(bottomDiv);
+        
         container.appendChild(card);
     });
 }
@@ -119,19 +164,44 @@ function renderStaff() {
     if (!container) return;
     const stadium = window.state.stadiums.find(s => s.id === (document.getElementById('stadium-select')?.value));
     if (!stadium) return;
-    container.innerHTML = '';
+    container.textContent = '';
 
     stadium.zones.forEach(zone => {
         const div = document.createElement('div');
         div.className = 'staff-control-card';
-        div.style = 'margin-bottom:1rem; padding:1rem; background:var(--bg-3); border-radius:var(--radius-md);';
-        div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-                <span style="font-size:0.85rem; font-weight:700;">${zone.name}</span>
-                <span style="font-size:0.85rem;">Crowd: ${zone.crowd}%</span>
-            </div>
-            <input type="range" min="0" max="100" value="${zone.crowd}" oninput="StateManager.updateZone('${stadium.id}', '${zone.id}', this.value)" style="width:100%; accent-color:var(--accent);">
-        `;
+        div.style.marginBottom = '1rem';
+        div.style.padding = '1rem';
+        div.style.background = 'var(--bg-3)';
+        div.style.borderRadius = 'var(--radius-md)';
+        
+        const topDiv = document.createElement('div');
+        topDiv.style.display = 'flex';
+        topDiv.style.justifyContent = 'space-between';
+        topDiv.style.marginBottom = '0.5rem';
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.style.fontSize = '0.85rem';
+        nameSpan.style.fontWeight = '700';
+        nameSpan.textContent = zone.name;
+        
+        const crowdSpan = document.createElement('span');
+        crowdSpan.style.fontSize = '0.85rem';
+        crowdSpan.textContent = `Crowd: ${zone.crowd}%`;
+        
+        topDiv.appendChild(nameSpan);
+        topDiv.appendChild(crowdSpan);
+        
+        const input = document.createElement('input');
+        input.type = 'range';
+        input.min = '0';
+        input.max = '100';
+        input.value = zone.crowd;
+        input.style.width = '100%';
+        input.style.accentColor = 'var(--accent)';
+        input.oninput = function() { window.StateManager.updateZone(stadium.id, zone.id, this.value); };
+        
+        div.appendChild(topDiv);
+        div.appendChild(input);
         container.appendChild(div);
     });
 }
@@ -173,7 +243,14 @@ function syncTabUI() {
     if (content) content.style.display = (activeTab === 'stalls') ? 'block' : 'flex';
     
     const title = document.getElementById('view-title');
-    if (title) title.innerHTML = `<i data-lucide="info"></i> ${activeTab.toUpperCase()} OVERVIEW`;
+    if (title) {
+        title.textContent = '';
+        const i = document.createElement('i');
+        i.setAttribute('data-lucide', 'info');
+        title.appendChild(i);
+        const text = document.createTextNode(` ${activeTab.toUpperCase()} OVERVIEW`);
+        title.appendChild(text);
+    }
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
@@ -183,7 +260,6 @@ function syncTabUI() {
 function setupVoiceAssistant() {
     const toggle = document.getElementById('voice-toggle');
     const status = document.getElementById('voice-status');
-    const icon = document.getElementById('voice-icon');
     
     // Restore
     const isEnabled = localStorage.getItem('smartstadium_voice') === 'true';
@@ -309,6 +385,6 @@ function setupChatbot() {
 }
 
 // Global scope joinStall
-window.joinStall = (id) => alert('Reservation confirmed. AI will notify you when your turn is near.');
+window.joinStall = () => alert('Reservation confirmed. AI will notify you when your turn is near.');
 
 document.addEventListener('DOMContentLoaded', initApp);

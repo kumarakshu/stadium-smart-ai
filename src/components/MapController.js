@@ -17,7 +17,12 @@ const MapController = {
         if (!mapBox) return;
 
         if (!CONFIG.GOOGLE_MAPS_API_KEY || CONFIG.GOOGLE_MAPS_API_KEY.includes('YOUR_')) {
-            mapBox.innerHTML = `<p style="padding:2rem; text-align:center;">API Key Required</p>`;
+            mapBox.textContent = '';
+            const p = document.createElement('p');
+            p.style.padding = '2rem';
+            p.style.textAlign = 'center';
+            p.textContent = 'API Key Required';
+            mapBox.appendChild(p);
             return;
         }
 
@@ -74,7 +79,21 @@ const MapController = {
             // 2. Advanced Marker (Better Performance & High Quality)
             const labelDiv = document.createElement('div');
             labelDiv.className = 'map-label-v2';
-            labelDiv.innerHTML = `<div style="background:${color}; padding:4px 8px; border-radius:4px; font-weight:800; border:2px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.3); font-size:10px;">${zone.name}<br>${zone.crowd}%</div>`;
+            
+            const innerDiv = document.createElement('div');
+            innerDiv.style.background = color;
+            innerDiv.style.padding = '4px 8px';
+            innerDiv.style.borderRadius = '4px';
+            innerDiv.style.fontWeight = '800';
+            innerDiv.style.border = '2px solid white';
+            innerDiv.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
+            innerDiv.style.fontSize = '10px';
+            
+            innerDiv.textContent = zone.name;
+            innerDiv.appendChild(document.createElement('br'));
+            innerDiv.appendChild(document.createTextNode(`${zone.crowd}%`));
+            
+            labelDiv.appendChild(innerDiv);
             
             const marker = new google.maps.marker.AdvancedMarkerElement({
                 map: googleMap,
@@ -92,7 +111,14 @@ const MapController = {
         if (!googleMap) return;
         if (!userMarker) {
              const userPin = document.createElement('div');
-             userPin.innerHTML = `<div style="width:20px; height:20px; background:#2563eb; border:3px solid white; border-radius:50%; box-shadow:0 0 15px #2563eb;"></div>`;
+             const pinDiv = document.createElement('div');
+             pinDiv.style.width = '20px';
+             pinDiv.style.height = '20px';
+             pinDiv.style.background = '#2563eb';
+             pinDiv.style.border = '3px solid white';
+             pinDiv.style.borderRadius = '50%';
+             pinDiv.style.boxShadow = '0 0 15px #2563eb';
+             userPin.appendChild(pinDiv);
              userMarker = new google.maps.marker.AdvancedMarkerElement({
                  map: googleMap,
                  position: coords,

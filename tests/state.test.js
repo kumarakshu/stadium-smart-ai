@@ -20,10 +20,8 @@ global.CustomEvent = class CustomEvent {
     }
 };
 
-// Require the state manager
-const fs = require('fs');
-const stateCode = fs.readFileSync('./src/engine/state.js', 'utf8');
-eval(stateCode);
+// Use require() so Istanbul/Jest can track coverage
+const { StateManager } = require('../src/engine/state');
 
 describe('SmartStadium StateManager', () => {
     
@@ -37,18 +35,19 @@ describe('SmartStadium StateManager', () => {
                     ]
                 }
             ],
+            stalls: [],
             emergency: { active: false }
         };
         jest.clearAllMocks();
     });
 
     it('should successfully update a zone crowd value', () => {
-        window.StateManager.updateZone('ahmedabad', 'gate_1', 85);
+        StateManager.updateZone('ahmedabad', 'gate_1', 85);
         expect(window.state.stadiums[0].zones[0].crowd).toBe(85);
     });
 
     it('should save to localStorage when state is updated', () => {
-        window.StateManager.updateZone('ahmedabad', 'gate_1', 90);
+        StateManager.updateZone('ahmedabad', 'gate_1', 90);
         expect(global.localStorage.setItem).toHaveBeenCalledWith(
             'smartstadium_data', 
             expect.any(String)
@@ -56,14 +55,41 @@ describe('SmartStadium StateManager', () => {
     });
 
     it('should successfully trigger an emergency broadcast', () => {
-        window.StateManager.setEmergency(true, 'EVACUATE');
+        StateManager.setEmergency(true, 'EVACUATE');
         expect(window.state.emergency.active).toBe(true);
         expect(window.state.emergency.message).toBe('EVACUATE');
         expect(global.window.dispatchEvent).toHaveBeenCalled();
     });
 
     it('should NOT update crowd if stadium is not found', () => {
-        window.StateManager.updateZone('invalid_stadium', 'gate_1', 10);
+        StateManager.updateZone('invalid_stadium', 'gate_1', 10);
         expect(window.state.stadiums[0].zones[0].crowd).toBe(50); // Unchanged
+    });
+
+    it('should NOT update crowd if zone is not found', () => {
+        StateManager.updateZone('ahmedabad', 'invalid_zone', 99);
+        expect(window.state.stadiums[0].zones[0].crowd).toBe(50); // Unchanged
+    });
+
+    it('should clear emergency with setEmergency(false)', () => {
+        StateManager.setEmergency(false, '');
+        expect(window.state.emergency.active).toBe(false);
+        expect(window.state.emergency.message).toBe('');
+    });
+
+    it('should call broadcast when updating a zone', () => {
+        StateManager.updateZone('ahmedabad', 'gate_1', 75);
+        expect(global.window.dispatchEvent).toHaveBeenCalled();
+    });
+
+    it('should restore state from localStorage on init()', async () => {
+        const mockSavedState = JSON.stringify({
+            stadiums: [{ id: 'wankhede', zones: [] }],
+            stalls: [],
+            emergency: { active: false }
+        });
+        global.localStorage.getItem = jest.fn(() => mockSavedState);
+        await StateManager.init();
+        expect(window.state.stadiums[0].id).toBe('wankhede');
     });
 });

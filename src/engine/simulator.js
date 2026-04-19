@@ -83,3 +83,8 @@ if (CONFIG.SIMULATION_AUTO_START) {
     setTimeout(() => SimulationEngine.start(), 1500);
 }
 window.SimulationEngine = SimulationEngine;
+
+// Allow Jest to instrument this file for coverage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SimulationEngine };
+}

@@ -64,3 +64,8 @@ const StateManager = {
 
 // Global accessor
 window.StateManager = StateManager;
+
+// Allow Jest to instrument this file for coverage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { StateManager };
+}

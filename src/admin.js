@@ -13,7 +13,7 @@ async function init() {
     setupBroadcasts();
     
     // Listen for Sync
-    window.addEventListener('simulation_update', (e) => {
+    window.addEventListener('simulation_update', () => {
         refreshUI();
     });
 
@@ -50,23 +50,49 @@ function renderMap() {
             return `<path d="${path}" fill="${color}" opacity="0.8" stroke="white" stroke-width="0.5" />`;
         }).join('')}
     </svg>`;
-    mapBox.innerHTML = svg;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svg, 'image/svg+xml');
+    mapBox.textContent = '';
+    mapBox.appendChild(doc.documentElement);
 }
 
 function setupControls() {
     const container = document.getElementById('zone-controls');
-    container.innerHTML = '';
+    container.textContent = '';
     
     state.zones.forEach(zone => {
         const row = document.createElement('div');
         row.className = 'control-row';
-        row.innerHTML = `
-            <div style="font-size: 0.8rem; font-weight: 600;">${zone.name}</div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span id="val-${zone.id}" style="font-size: 0.8rem; min-width: 30px;">${zone.crowd}%</span>
-                <input type="range" min="0" max="100" value="${zone.crowd}" data-id="${zone.id}" class="zone-slider">
-            </div>
-        `;
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.style.fontSize = '0.8rem';
+        nameDiv.style.fontWeight = '600';
+        nameDiv.textContent = zone.name;
+
+        const valCont = document.createElement('div');
+        valCont.style.display = 'flex';
+        valCont.style.alignItems = 'center';
+        valCont.style.gap = '0.5rem';
+
+        const span = document.createElement('span');
+        span.id = `val-${zone.id}`;
+        span.style.fontSize = '0.8rem';
+        span.style.minWidth = '30px';
+        span.textContent = `${zone.crowd}%`;
+
+        const input = document.createElement('input');
+        input.type = 'range';
+        input.min = '0';
+        input.max = '100';
+        input.value = zone.crowd;
+        input.dataset.id = zone.id;
+        input.className = 'zone-slider';
+
+        valCont.appendChild(span);
+        valCont.appendChild(input);
+        row.appendChild(nameDiv);
+        row.appendChild(valCont);
+        
         container.appendChild(row);
     });
 
@@ -97,18 +123,38 @@ function updateStats() {
 
 function updateIncidentLog() {
     const log = document.getElementById('log-list');
+    log.textContent = '';
     if (window.state.emergency.active) {
-        log.innerHTML = `
-            <div style="background: rgba(220, 38, 38, 0.1); border-left: 3px solid var(--sos); padding: 0.75rem; border-radius: 0.25rem;">
-                <div style="display: flex; justify-content: space-between; font-weight: 700; color: var(--sos);">
-                    <span>ADMIN_BROADCAST</span>
-                    <span>JUST NOW</span>
-                </div>
-                <div style="margin-top: 0.25rem;">${window.state.emergency.message}</div>
-            </div>
-        `;
+        const wrap = document.createElement('div');
+        wrap.style.background = 'rgba(220, 38, 38, 0.1)';
+        wrap.style.borderLeft = '3px solid var(--sos)';
+        wrap.style.padding = '0.75rem';
+        wrap.style.borderRadius = '0.25rem';
+        
+        const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.fontWeight = '700';
+        header.style.color = 'var(--sos)';
+        
+        const s1 = document.createElement('span'); s1.textContent = 'ADMIN_BROADCAST';
+        const s2 = document.createElement('span'); s2.textContent = 'JUST NOW';
+        
+        const msg = document.createElement('div');
+        msg.style.marginTop = '0.25rem';
+        msg.textContent = window.state.emergency.message;
+        
+        header.appendChild(s1);
+        header.appendChild(s2);
+        wrap.appendChild(header);
+        wrap.appendChild(msg);
+        log.appendChild(wrap);
     } else {
-        log.innerHTML = `<div style="color: var(--text-secondary); font-style: italic;">No active incidents.</div>`;
+        const p = document.createElement('div');
+        p.style.color = 'var(--text-secondary)';
+        p.style.fontStyle = 'italic';
+        p.textContent = 'No active incidents.';
+        log.appendChild(p);
     }
 }
 

@@ -17,5 +17,13 @@
   "devDependencies": {
     "eslint": "^8.57.1",
     "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/engine/simulator.js",
+      "src/engine/state.js",
+      "src/components/AssistantController.js"
+    ]
   }
 }

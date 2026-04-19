@@ -3,6 +3,7 @@
  * Rename this file to config.js and add your actual API keys.
  * DO NOT commit the config.js file with real keys to GitHub.
  */
+// eslint-disable-next-line no-unused-vars
 const CONFIG = {
     GEMINI_API_KEY: 'YOUR_GEMINI_API_KEY_HERE',
     GOOGLE_MAPS_API_KEY: 'YOUR_GOOGLE_MAPS_API_KEY_HERE',
