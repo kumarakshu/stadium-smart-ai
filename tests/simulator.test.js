@@ -1,60 +1,57 @@
 /**
- * SmartStadium AI - Simulator Tests
+ * SmartStadium AI - Simulator Tests (jsdom compatible)
  */
 
-global.window = {
-    state: null,
-    dispatchEvent: jest.fn()
-};
-
-global.localStorage = {
-    setItem: jest.fn(),
-    getItem: jest.fn(() => null)
-};
-
+// CONFIG must be set before requiring the module
 global.CONFIG = {
     SIMULATION_AUTO_START: false,
     SIMULATION_INTERVAL: 10000
 };
 
-// Mock Worker class
+// Mock Web Worker globally
 global.Worker = class {
-    constructor(path) { 
-        this.postMessage = jest.fn(); 
+    constructor(path) {
+        this.postMessage = jest.fn();
         this.path = path;
     }
 };
-global.window.Worker = global.Worker;
 
 const { SimulationEngine } = require('../src/engine/simulator');
+
+// --- Helpers ---
+let lsGetSpy, lsSetSpy;
 
 describe('Simulation Engine', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.useFakeTimers();
+
+        // Spy on real jsdom localStorage
+        lsGetSpy = jest.spyOn(Storage.prototype, 'getItem').mockReturnValue(null);
+        lsSetSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {});
+
         SimulationEngine.currentPhase = 0;
         SimulationEngine.phaseTick = 0;
         SimulationEngine.worker = null;
-        global.window.SimulationEngine = SimulationEngine;
-        global.window.state = { stadiums: [], stalls: [], emergency: { active: false } };
-        global.localStorage.getItem.mockReturnValue(null);
+        window.state = { stadiums: [], stalls: [], emergency: { active: false } };
     });
 
     afterEach(() => {
         jest.clearAllTimers();
         jest.useRealTimers();
+        jest.restoreAllMocks();
     });
 
     it('should increment phaseTick on tick()', () => {
-        SimulationEngine.worker = new global.Worker('dummy');
+        SimulationEngine.worker = new Worker('dummy');
         SimulationEngine.tick();
         expect(SimulationEngine.phaseTick).toBe(1);
     });
 
     it('should change phase after 12 ticks', () => {
-        SimulationEngine.worker = new global.Worker('dummy');
+        SimulationEngine.worker = new Worker('dummy');
         SimulationEngine.phaseTick = 12;
-        SimulationEngine.tick(); // 13th tick changes phase
+        SimulationEngine.tick();
         expect(SimulationEngine.currentPhase).toBe(1);
         expect(SimulationEngine.phaseTick).toBe(0);
     });
@@ -69,22 +66,22 @@ describe('Simulation Engine', () => {
     });
 
     it('should do nothing on tick() without state', () => {
-        global.window.state = null;
+        window.state = null;
         SimulationEngine.tick();
-        expect(SimulationEngine.phaseTick).toBe(0); // unchanged
+        expect(SimulationEngine.phaseTick).toBe(0);
     });
 
     it('should cycle phases correctly (0->1->2->0)', () => {
-        SimulationEngine.worker = new global.Worker('dummy');
+        SimulationEngine.worker = new Worker('dummy');
         SimulationEngine.currentPhase = 2;
         SimulationEngine.phaseTick = 12;
         SimulationEngine.tick();
-        expect(SimulationEngine.currentPhase).toBe(0); // wraps around
+        expect(SimulationEngine.currentPhase).toBe(0);
     });
 
     it('should restore state from localStorage on start if missing', () => {
-        global.window.state = null;
-        global.localStorage.getItem.mockImplementation((key) => {
+        window.state = null;
+        lsGetSpy.mockImplementation((key) => {
             if (key === 'smartstadium_data') return JSON.stringify({ restored: true });
             return null;
         });
@@ -93,7 +90,7 @@ describe('Simulation Engine', () => {
     });
 
     it('should restore phase from localStorage on start()', () => {
-        global.localStorage.getItem = jest.fn((key) => {
+        lsGetSpy.mockImplementation((key) => {
             if (key === 'smartstadium_sim_phase') return '2';
             if (key === 'smartstadium_sim_tick') return '5';
             return null;
@@ -104,68 +101,52 @@ describe('Simulation Engine', () => {
     });
 
     it('should initialize worker and handle onmessage', () => {
+        const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
         SimulationEngine.worker = null;
         SimulationEngine.start();
         expect(SimulationEngine.worker).not.toBeNull();
-        
-        // Trigger onmessage
+
         const mockState = { stadiums: [{ test: 1 }] };
         SimulationEngine.worker.onmessage({ data: { state: mockState } });
         expect(window.state).toEqual(mockState);
-        expect(global.localStorage.setItem).toHaveBeenCalledWith('smartstadium_data', JSON.stringify(mockState));
-        expect(global.window.dispatchEvent).toHaveBeenCalled();
+        expect(lsSetSpy).toHaveBeenCalledWith('smartstadium_data', JSON.stringify(mockState));
+        expect(dispatchSpy).toHaveBeenCalled();
     });
 
     it('should fallback natively if Worker throws exception', () => {
         const originalWorker = global.Worker;
-        const originalWindowWorker = global.window.Worker;
-        
-        global.Worker = class {
-            constructor() { throw new Error('CORS issue'); }
-        };
-        global.window.Worker = global.Worker;
-
+        global.Worker = class { constructor() { throw new Error('CORS issue'); } };
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         SimulationEngine.start();
         expect(consoleErrorSpy).toHaveBeenCalled();
         expect(SimulationEngine.worker).toBeNull();
-        
         global.Worker = originalWorker;
-        global.window.Worker = originalWindowWorker;
-        consoleErrorSpy.mockRestore();
     });
 
     it('should warn if Worker is not supported', () => {
         const originalWorker = global.Worker;
-        const originalWindowWorker = global.window.Worker;
-        
+        Object.defineProperty(window, 'Worker', { value: undefined, writable: true, configurable: true });
         global.Worker = undefined;
-        global.window.Worker = undefined;
-        
         const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
         SimulationEngine.start();
         expect(consoleWarnSpy).toHaveBeenCalledWith('Web Workers not supported in this browser.');
-        
+        Object.defineProperty(window, 'Worker', { value: originalWorker, writable: true, configurable: true });
         global.Worker = originalWorker;
-        global.window.Worker = originalWindowWorker;
-        consoleWarnSpy.mockRestore();
     });
-
 });
 
 describe('Simulation Engine Auto Start', () => {
     it('should auto-start if CONFIG.SIMULATION_AUTO_START is true', () => {
         jest.useFakeTimers();
         global.CONFIG.SIMULATION_AUTO_START = true;
-        
+
         let loadedEngine;
         jest.isolateModules(() => {
             const mod = require('../src/engine/simulator');
             loadedEngine = mod.SimulationEngine;
         });
-        
+
         const spyStart = jest.spyOn(loadedEngine, 'start').mockImplementation(() => {});
-        
         jest.advanceTimersByTime(2000);
         expect(spyStart).toHaveBeenCalled();
         jest.clearAllTimers();

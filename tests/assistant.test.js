@@ -1,39 +1,41 @@
 /**
- * SmartStadium AI - Assistant Controller Tests
+ * SmartStadium AI - Assistant Controller Tests (jsdom compatible)
  */
 
-// Mock environment
-global.window = {
-    state: {
-        stadiums: [{
-            id: 'ahmedabad',
-            name: 'Narendra Modi Stadium',
-            zones: [
-                { id: 'gate_1', name: 'Gate 1', type: 'entry', crowd: 10 },
-                { id: 'gate_2', name: 'Gate 2', type: 'entry', crowd: 90 }
-            ]
-        }],
-        stalls: [
-            { id: 'c1', name: 'Tea Point', location: 'East Stand', avg_wait: 5 },
-            { id: 'f1', name: 'Pizza Hut', location: 'West Stand', avg_wait: 20 }
-        ],
-        emergency: { active: false }
-    }
+// CONFIG must be global before requiring module
+global.CONFIG = { GEMINI_API_KEY: '' };
+global.fetch = jest.fn();
+
+// Set up window state (jsdom provides window, so just assign properties)
+window.state = {
+    stadiums: [{
+        id: 'ahmedabad',
+        name: 'Narendra Modi Stadium',
+        zones: [
+            { id: 'gate_1', name: 'Gate 1', type: 'entry', crowd: 10 },
+            { id: 'gate_2', name: 'Gate 2', type: 'entry', crowd: 90 }
+        ]
+    }],
+    stalls: [
+        { id: 'c1', name: 'Tea Point', location: 'East Stand', avg_wait: 5 },
+        { id: 'f1', name: 'Pizza Hut', location: 'West Stand', avg_wait: 20 }
+    ],
+    emergency: { active: false }
 };
 
-global.CONFIG = { GEMINI_API_KEY: '' };
-global.document = { getElementById: () => ({ value: 'ahmedabad' }) };
-global.fetch = jest.fn();
+// jsdom has document, but mock getElementById to return ahmedabad
+jest.spyOn(document, 'getElementById').mockReturnValue({ value: 'ahmedabad' });
 
 const { AssistantController } = require('../src/components/AssistantController');
 
 describe('Assistant Controller Fallbacks', () => {
     let stadium, state;
     beforeEach(() => {
-        state = global.window.state;
+        state = window.state;
         stadium = state.stadiums[0];
         state.emergency.active = false;
         jest.clearAllMocks();
+        jest.spyOn(document, 'getElementById').mockReturnValue({ value: 'ahmedabad' });
     });
 
     it('should return emergency response if emergency is active', () => {
@@ -101,9 +103,13 @@ describe('Assistant Controller Main Flow', () => {
         jest.clearAllMocks();
         AssistantController.voiceEnabled = true;
         global.CONFIG.GEMINI_API_KEY = 'REAL_API_KEY';
-        // Mock fallback to track it
         jest.spyOn(AssistantController, 'fallback').mockReturnValue('Fallback Text');
         jest.spyOn(AssistantController, 'speak').mockImplementation(() => {});
+        jest.spyOn(document, 'getElementById').mockReturnValue({ value: 'ahmedabad' });
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     it('should use fallback if API_KEY is empty or missing', async () => {
@@ -154,10 +160,15 @@ describe('Assistant Controller Main Flow', () => {
 describe('Assistant Controller Voice Listen/Speak', () => {
     beforeEach(() => {
         jest.restoreAllMocks();
-    });
-    afterEach(() => {
+        jest.spyOn(document, 'getElementById').mockReturnValue({ value: 'ahmedabad' });
+        AssistantController.recognition = null;
+        // Remove any leftover speech mocks
         delete window.speechSynthesis;
         delete window.SpeechRecognition;
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
         AssistantController.recognition = null;
     });
 
@@ -169,16 +180,13 @@ describe('Assistant Controller Voice Listen/Speak', () => {
         const mockSpeak = jest.fn();
         const mockCancel = jest.fn();
         const mockGetVoices = jest.fn().mockReturnValue([{ lang: 'en-US', name: 'Google US' }]);
-        global.window.speechSynthesis = {
-            speak: mockSpeak,
-            cancel: mockCancel,
-            getVoices: mockGetVoices
-        };
-        global.window.SpeechSynthesisUtterance = class {
+        Object.defineProperty(window, 'speechSynthesis', {
+            value: { speak: mockSpeak, cancel: mockCancel, getVoices: mockGetVoices },
+            writable: true, configurable: true
+        });
+        global.SpeechSynthesisUtterance = class {
             constructor(text) { this.text = text; }
         };
-        // Need to make sure SpeechSynthesisUtterance is globally accessible if AssistantController uses new SpeechSynthesisUtterance
-        global.SpeechSynthesisUtterance = global.window.SpeechSynthesisUtterance;
         AssistantController.speak('hello');
         expect(mockCancel).toHaveBeenCalled();
         expect(mockSpeak).toHaveBeenCalled();
@@ -193,15 +201,18 @@ describe('Assistant Controller Voice Listen/Speak', () => {
     it('should setup SpeechRecognition and trigger callbacks', () => {
         let onresultCallback, onerrorCallback, onendCallback;
         const mockStart = jest.fn();
-        
-        global.window.SpeechRecognition = class {
-            constructor() {
-                this.start = mockStart;
-            }
+
+        const MockSpeechRecognition = class {
+            constructor() { this.start = mockStart; }
             set onresult(cb) { onresultCallback = cb; }
             set onerror(cb) { onerrorCallback = cb; }
             set onend(cb) { onendCallback = cb; }
         };
+
+        Object.defineProperty(window, 'SpeechRecognition', {
+            value: MockSpeechRecognition,
+            writable: true, configurable: true
+        });
 
         const onResult = jest.fn();
         const onError = jest.fn();
@@ -210,13 +221,13 @@ describe('Assistant Controller Voice Listen/Speak', () => {
         AssistantController.listen(onResult, onError, onEnd);
         expect(mockStart).toHaveBeenCalled();
 
-        if(onresultCallback) onresultCallback({ results: [[{ transcript: 'test voice' }]] });
+        if (onresultCallback) onresultCallback({ results: [[{ transcript: 'test voice' }]] });
         expect(onResult).toHaveBeenCalledWith('test voice');
 
-        if(onerrorCallback) onerrorCallback({ error: 'network' });
+        if (onerrorCallback) onerrorCallback({ error: 'network' });
         expect(onError).toHaveBeenCalledWith('network');
 
-        if(onendCallback) onendCallback();
+        if (onendCallback) onendCallback();
         expect(onEnd).toHaveBeenCalled();
     });
 });
