@@ -75,12 +75,27 @@ const AssistantController = {
                 responseText = this.fallback(query, state, stadium);
             }
 
+            // Advanced: Google Cloud Translation Integration
+            if (window.TranslationService && query) {
+                const detectedLang = await window.TranslationService.detectLanguage(query);
+                if (detectedLang !== 'en') {
+                    console.log(`AssistantController: Translating response to ${detectedLang}...`);
+                    responseText = await window.TranslationService.translate(responseText, detectedLang);
+                }
+            }
+
             if (this.voiceEnabled) this.speak(responseText);
             return responseText;
  
         } catch (err) {
             console.error('AssistantController: Network Error', err);
-            const fallbackRes = this.fallback(query, state, stadium);
+            let fallbackRes = this.fallback(query, state, stadium);
+            
+            if (window.TranslationService && query) {
+                const detectedLang = await window.TranslationService.detectLanguage(query);
+                if (detectedLang !== 'en') fallbackRes = await window.TranslationService.translate(fallbackRes, detectedLang);
+            }
+
             if (this.voiceEnabled) this.speak(fallbackRes);
             return fallbackRes;
         }
@@ -168,12 +183,12 @@ const AssistantController = {
                 }
             },
             {
-                keys: ['food', 'hungry', 'stall', 'khana', 'bhuk', 'bhook', 'chai', 'tea', 'coffee', 'pani', 'water', 'cafe'],
+                keys: ['food', 'hungry', 'stall', 'khana', 'bhuk', 'bhook', 'chai', 'tea', 'coffee', 'pani', 'water', 'cafe', 'eat', 'khana'],
                 resp: () => {
                     const items = state?.stalls || [];
                     const best = items.sort((a,b) => a.avg_wait - b.avg_wait)[0];
                     if (q.includes('chai') || q.includes('tea') || q.includes('coffee')) {
-                        const tea = items.find(i => i.name.toLowerCase().includes('tea') || i.name.toLowerCase().includes('coffee'));
+                        const tea = items.find(i => i.name.toLowerCase().includes('tea') || i.name.toLowerCase().includes('coffee') || i.name.toLowerCase().includes('chai'));
                         return tea ? `Chai/Coffee is available at ${tea.name} (${tea.location}). Wait time is ${tea.avg_wait}m.` : 'Tea stalls are located near the East and West stands.';
                     }
                     return best ? `I recommend ${best.name} at ${best.location}. It's the fastest option right now (${best.avg_wait}m wait).` : "Please check the 'Food' tab for live wait times at all available stalls.";

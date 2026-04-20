@@ -100,6 +100,36 @@ describe('Simulation Engine', () => {
         expect(SimulationEngine.phaseTick).toBe(5);
     });
 
+    it('should restore phase with default tick if missing from localStorage on start()', () => {
+        lsGetSpy.mockImplementation((key) => {
+            if (key === 'smartstadium_sim_phase') return '1';
+            return null; 
+        });
+        SimulationEngine.start();
+        expect(SimulationEngine.currentPhase).toBe(1);
+        expect(SimulationEngine.phaseTick).toBe(0);
+    });
+
+    it('should use default simulation interval if CONFIG.SIMULATION_INTERVAL missing', () => {
+        const originalInterval = global.CONFIG.SIMULATION_INTERVAL;
+        delete global.CONFIG.SIMULATION_INTERVAL;
+        const setIntervalSpy = jest.spyOn(global, 'setInterval');
+        SimulationEngine.start();
+        expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 10000);
+        global.CONFIG.SIMULATION_INTERVAL = originalInterval;
+    });
+
+    it('should not restore state from localStorage if state already exists', () => {
+        const existingState = { stadiums: [], existing: true };
+        window.state = existingState;
+        lsGetSpy.mockImplementation((key) => {
+            if (key === 'smartstadium_data') return JSON.stringify({ overwritten: true });
+            return null;
+        });
+        SimulationEngine.start();
+        expect(window.state).toBe(existingState);
+    });
+
     it('should initialize worker and handle onmessage', () => {
         const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
         SimulationEngine.worker = null;
@@ -132,6 +162,16 @@ describe('Simulation Engine', () => {
         expect(consoleWarnSpy).toHaveBeenCalledWith('Web Workers not supported in this browser.');
         Object.defineProperty(window, 'Worker', { value: originalWorker, writable: true, configurable: true });
         global.Worker = originalWorker;
+    });
+
+    it('should restore state from rawData if state is missing in simulator', () => {
+        window.state = null;
+        lsGetSpy.mockImplementation((key) => {
+            if (key === 'smartstadium_data') return JSON.stringify({ raw: true });
+            return null;
+        });
+        SimulationEngine.start();
+        expect(window.state).toEqual({ raw: true });
     });
 });
 

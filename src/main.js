@@ -224,7 +224,7 @@ function setupNavigation() {
              const target = item.dataset.tab;
              if (target === 'staff') {
                 const pin = prompt('Staff PIN:');
-                if (pin !== '1234') return alert('Access denied.');
+                if (pin !== (CONFIG.STAFF_PIN || '1234')) return alert('Access denied.');
              }
              activeTab = target;
              localStorage.setItem('smartstadium_active_tab', activeTab);

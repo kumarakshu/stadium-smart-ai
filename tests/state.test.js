@@ -43,6 +43,9 @@ describe('SmartStadium StateManager', () => {
         StateManager.setEmergency(true, 'EVACUATE');
         expect(window.state.emergency.active).toBe(true);
 
+        StateManager.setEmergency(true); // default message
+        expect(window.state.emergency.message).toBe('');
+
         StateManager.setEmergency(false, '');
         expect(window.state.emergency.active).toBe(false);
     });
